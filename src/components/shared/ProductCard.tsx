@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Plus, Minus } from 'lucide-react';
 import type { Product } from '../../types/database';
 import { useCart } from '../../context/CartContext';
@@ -7,6 +8,7 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const [imgError, setImgError] = useState(false);
   const { items, addItem, updateQuantity, removeItem } = useCart();
   const cartItem = items.find((i) => i.product.id === product.id);
   const quantity = cartItem?.quantity ?? 0;
@@ -16,18 +18,13 @@ export default function ProductCard({ product }: ProductCardProps) {
     <div className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-lg hover:shadow-black/5 hover:-translate-y-0.5 transition-all duration-300">
       {/* Image */}
       <div className="relative aspect-square bg-gray-50 overflow-hidden">
-        {product.image_url ? (
-          <img
-            src={product.image_url}
-            alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            loading="lazy"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-5xl bg-gradient-to-br from-gray-50 to-gray-100">
-            🛍️
-          </div>
-        )}
+        <img
+          src={(!product.image_url || imgError) ? '/placeholder.png' : product.image_url}
+          alt={product.name}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          loading="lazy"
+          onError={() => setImgError(true)}
+        />
 
         {outOfStock && (
           <div className="absolute inset-0 bg-white/70 backdrop-blur-sm flex items-center justify-center">
