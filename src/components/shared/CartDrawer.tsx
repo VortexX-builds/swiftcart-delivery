@@ -67,17 +67,14 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                   >
                     {/* Product Image */}
                     <div className="w-16 h-16 rounded-xl bg-white flex-shrink-0 overflow-hidden border border-gray-100">
-                      {product.image_url ? (
-                        <img
-                          src={product.image_url}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-2xl">
-                          🛒
-                        </div>
-                      )}
+                      <img
+                        src={product.image_url || '/placeholder.png'}
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/placeholder.png';
+                        }}
+                      />
                     </div>
 
                     {/* Product Details */}

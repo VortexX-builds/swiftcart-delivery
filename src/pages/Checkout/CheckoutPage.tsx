@@ -28,7 +28,7 @@ export default function CheckoutPage() {
 
   const { subtotal, platformFee, cgst, sgst, deliveryFee, grandTotal } = calculateBillingBreakdown(totalPrice);
 
-  const handlePlaceOrder = async (_paymentMethod: PaymentMethod) => {
+  const handlePlaceOrder = async (paymentMethod: PaymentMethod) => {
     setStep('placing');
     setOrderError(null);
 
@@ -59,9 +59,10 @@ export default function CheckoutPage() {
       return;
     }
 
-    // Set success BEFORE clearing cart to avoid the empty-cart guard firing
     setOrderId(data.id);
-    setStep('success');
+    if (paymentMethod !== 'upi') {
+      setStep('success');
+    }
     clearCart();
     scheduleNewOrder({
       id: data.id,
@@ -71,6 +72,10 @@ export default function CheckoutPage() {
       user_id: user.id,
       cart_items: [],
     } as import('../../types/database').Order);
+
+    if (paymentMethod === 'upi') {
+      navigate(`/order-tracking/${data.id}`, { replace: true });
+    }
   };
 
   /* ── Success Modal ───────────────────────────────────────── */
@@ -211,11 +216,14 @@ export default function CheckoutPage() {
                   {items.map(({ product, quantity }) => (
                     <div key={product.id} className="flex items-center gap-4 px-5 py-4">
                       <div className="w-14 h-14 rounded-xl bg-gray-50 flex-shrink-0 overflow-hidden border border-gray-100">
-                        {product.image_url ? (
-                          <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-xl">🛒</div>
-                        )}
+                        <img
+                          src={product.image_url || '/placeholder.png'}
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/placeholder.png';
+                          }}
+                        />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-gray-900 truncate">{product.name}</p>

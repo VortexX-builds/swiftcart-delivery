@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   Lock,
 } from 'lucide-react';
+import QRCode from 'react-qr-code';
 
 export type PaymentMethod = 'upi' | 'card' | 'cod' | null;
 
@@ -31,67 +32,6 @@ function formatExpiry(value: string) {
   return digits;
 }
 
-/* ─── Mock QR Code ────────────────────────────────────────── */
-
-// Deterministic dot pattern — purely decorative, no real data
-const QR_PATTERN = [
-  [1,1,1,1,1,1,1,0,1,0,0,0,1,0,1,1,1,1,1,1,1],
-  [1,0,0,0,0,0,1,0,0,1,0,1,0,0,1,0,0,0,0,0,1],
-  [1,0,1,1,1,0,1,0,1,0,1,0,1,0,1,0,1,1,1,0,1],
-  [1,0,1,1,1,0,1,0,0,0,1,1,0,0,1,0,1,1,1,0,1],
-  [1,0,1,1,1,0,1,0,1,1,0,0,1,0,1,0,1,1,1,0,1],
-  [1,0,0,0,0,0,1,0,0,1,1,0,0,0,1,0,0,0,0,0,1],
-  [1,1,1,1,1,1,1,0,1,0,1,0,1,0,1,1,1,1,1,1,1],
-  [0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0],
-  [1,0,1,1,0,1,1,1,0,0,1,0,1,1,0,1,1,0,1,0,1],
-  [0,1,0,0,1,0,0,0,1,1,0,1,0,0,1,0,0,1,0,1,0],
-  [1,1,0,1,0,1,1,0,1,0,1,0,1,1,0,1,0,0,1,1,0],
-  [0,0,1,0,1,1,0,1,0,1,1,1,0,0,1,1,0,1,0,0,1],
-  [1,0,1,1,0,0,1,0,1,0,0,0,1,1,0,0,1,0,1,1,0],
-  [0,0,0,0,0,0,0,0,1,0,1,1,0,0,0,1,0,1,0,0,1],
-  [1,1,1,1,1,1,1,0,0,1,0,0,1,0,1,0,0,0,1,0,1],
-  [1,0,0,0,0,0,1,0,1,0,1,1,0,1,0,1,0,1,0,1,0],
-  [1,0,1,1,1,0,1,0,0,1,0,0,1,0,1,0,1,0,0,1,1],
-  [1,0,1,1,1,0,1,0,1,0,1,1,0,1,0,1,0,1,1,0,0],
-  [1,0,1,1,1,0,1,0,0,1,1,0,1,0,1,0,1,0,0,1,1],
-  [1,0,0,0,0,0,1,0,1,1,0,1,0,0,0,1,0,1,0,0,1],
-  [1,1,1,1,1,1,1,0,0,0,1,0,1,1,0,0,1,0,1,1,0],
-];
-
-function MockQR({ amount }: { amount: number }) {
-  return (
-    <div className="flex flex-col items-center gap-3">
-      <div className="bg-white p-3 rounded-2xl shadow-md border border-gray-100 inline-block">
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: `repeat(${QR_PATTERN[0].length}, 8px)`,
-            gap: '1px',
-          }}
-        >
-          {QR_PATTERN.flat().map((cell, i) => (
-            <div
-              key={i}
-              style={{
-                width: 8,
-                height: 8,
-                backgroundColor: cell ? '#111827' : '#ffffff',
-                borderRadius: cell ? 1 : 0,
-              }}
-            />
-          ))}
-        </div>
-      </div>
-      <div className="text-center">
-        <p className="text-xs font-semibold text-gray-700">SwiftCart Payments</p>
-        <p className="text-xs text-gray-400 mt-0.5">Scan with any UPI app</p>
-        <div className="mt-1.5 inline-flex items-center gap-1 bg-brand/10 text-brand text-xs font-bold px-3 py-1 rounded-full">
-          ₹{amount.toFixed(2)}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 /* ─── Method Selector Button ─────────────────────────────── */
 
@@ -234,9 +174,11 @@ export default function PaymentPanel({ grandTotal, onConfirm, isProcessing }: Pa
   const [cardCvv, setCardCvv] = useState('');
   const [cvvFocused, setCvvFocused] = useState(false);
 
+  const isValidUpi = upiId.length > 3 && upiId.includes('@');
+
   const isPaymentValid = (() => {
     if (method === 'cod') return true;
-    if (method === 'upi') return upiId.trim().length > 3 && upiId.includes('@');
+    if (method === 'upi') return isValidUpi;
     if (method === 'card') {
       const cleanCard = cardNumber.replace(/\D/g, '');
       return (
@@ -293,16 +235,55 @@ export default function PaymentPanel({ grandTotal, onConfirm, isProcessing }: Pa
 
       {/* ── UPI Flow ── */}
       {method === 'upi' && (
-        <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
-          <MockQR amount={grandTotal} />
-          <input
-            id="upi-id-input"
-            type="text"
-            value={upiId}
-            onChange={(e) => setUpiId(e.target.value)}
-            placeholder="yourname@upi"
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand bg-white transition-all"
-          />
+        <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-200">
+
+          {/* Manual Entry Flow */}
+          <div className="space-y-3">
+            <label htmlFor="upi-id-input" className="text-sm font-semibold text-gray-700">
+              Enter UPI ID Manually
+            </label>
+            <input
+              id="upi-id-input"
+              type="text"
+              value={upiId}
+              onChange={(e) => setUpiId(e.target.value)}
+              placeholder="yourname@upi"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand bg-white transition-all"
+            />
+          </div>
+
+          {/* Divider */}
+          <div className="relative flex items-center py-2">
+            <div className="flex-grow border-t border-gray-100"></div>
+            <span className="flex-shrink-0 mx-4 text-xs font-medium text-gray-400">OR</span>
+            <div className="flex-grow border-t border-gray-100"></div>
+          </div>
+
+          {/* QR Code Simulation Flow */}
+          <div className="space-y-4 bg-gray-50 p-5 rounded-2xl border border-gray-100 flex flex-col items-center">
+            <p className="text-sm font-semibold text-gray-700">Scan QR Code</p>
+            <div className="bg-white p-3 rounded-xl shadow-sm">
+              <QRCode
+                value={`${window.location.origin}/mock-payment?amount=${grandTotal}`}
+                size={160}
+                style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                viewBox={`0 0 256 256`}
+              />
+            </div>
+            <p className="text-xs text-gray-400 text-center">
+              Scan with any UPI app on your phone
+            </p>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                onConfirm('upi');
+              }}
+              disabled={isProcessing}
+              className="mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border-2 border-brand/20 text-brand text-sm font-bold hover:bg-brand/5 active:scale-[0.98] transition-all duration-200"
+            >
+              Simulate QR Scan
+            </button>
+          </div>
         </div>
       )}
 

@@ -14,6 +14,7 @@ import ProfilePage from './pages/Profile/ProfilePage';
 import ProfileSetupPage from './pages/Profile/ProfileSetupPage';
 import SettingsPage from './pages/Profile/SettingsPage';
 import OrderTrackingPage from './pages/OrderTracking/OrderTrackingPage';
+import MockUpiPage from './pages/MockUpiPage';
 import { Zap } from 'lucide-react';
 
 function LoadingScreen() {
@@ -110,6 +111,7 @@ function AppLayout() {
               </ProtectedRoute>
             }
           />
+          <Route path="/mock-payment" element={<MockUpiPage />} />
         </Routes>
       </main>
     </div>
