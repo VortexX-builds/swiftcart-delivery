@@ -234,10 +234,24 @@ export default function PaymentPanel({ grandTotal, onConfirm, isProcessing }: Pa
   const [cardCvv, setCardCvv] = useState('');
   const [cvvFocused, setCvvFocused] = useState(false);
 
-  // Button is ready as soon as a method is chosen — no strict validation for demo
-  const isReady = method !== null;
+  const isPaymentValid = (() => {
+    if (method === 'cod') return true;
+    if (method === 'upi') return upiId.trim().length > 3 && upiId.includes('@');
+    if (method === 'card') {
+      const cleanCard = cardNumber.replace(/\D/g, '');
+      return (
+        cleanCard.length >= 15 &&
+        cleanCard.length <= 16 &&
+        /^\d{2}\/\d{2}$/.test(cardExpiry) &&
+        cardCvv.length >= 3 &&
+        cardCvv.length <= 4
+      );
+    }
+    return false;
+  })();
 
   const handleConfirm = () => {
+    if (!isPaymentValid) return;
     onConfirm(method);
   };
 
@@ -379,7 +393,7 @@ export default function PaymentPanel({ grandTotal, onConfirm, isProcessing }: Pa
       <button
         id="confirm-payment-btn"
         onClick={handleConfirm}
-        disabled={!isReady || isProcessing}
+        disabled={!isPaymentValid || isProcessing}
         className="w-full flex items-center justify-center gap-2 bg-brand text-white py-3.5 rounded-2xl text-sm font-bold
           hover:bg-brand-dark active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed
           transition-all duration-200 shadow-lg shadow-brand/25"

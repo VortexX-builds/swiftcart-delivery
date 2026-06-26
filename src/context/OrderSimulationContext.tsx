@@ -5,6 +5,8 @@ import { supabase } from '../lib/supabase';
 import { SIM_ON_THE_WAY_MS, SIM_DELIVERED_MS } from '../lib/simulationConfig';
 import type { Order } from '../types/database';
 
+const NOTIFICATION_STORAGE_KEY = 'swiftcart_notified_orders';
+
 /* ─── Types ────────────────────────────────────────────────── */
 
 interface SimContextValue {
@@ -27,7 +29,7 @@ export function useOrderSimulation() {
 /* ─── Provider ──────────────────────────────────────────────── */
 
 export function OrderSimulationProvider({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const [activeOrders, setActiveOrders] = useState<Order[]>([]);
   const activeOrdersRef = useRef<Order[]>([]);
   const [currentTick, setCurrentTick] = useState<number>(Date.now());
@@ -44,8 +46,9 @@ export function OrderSimulationProvider({ children }: { children: React.ReactNod
     if (notifiedOrdersRef.current.has(order.id)) return;
     
     // 2. Local Storage deduplication (cross-refresh path)
-    let notifiedStr = localStorage.getItem('swiftcart_notified_orders');
+    let notifiedStr = localStorage.getItem(NOTIFICATION_STORAGE_KEY);
     let notifiedArr: string[] = [];
+    
     if (notifiedStr) {
       try {
         notifiedArr = JSON.parse(notifiedStr);
@@ -54,13 +57,13 @@ export function OrderSimulationProvider({ children }: { children: React.ReactNod
 
     if (notifiedArr.includes(order.id)) {
       notifiedOrdersRef.current.add(order.id); // sync in-memory
-      return; // Already notified on a previous session/refresh
+      return; // Silently skip notification
     }
 
     // Add to both tracking structures
     notifiedOrdersRef.current.add(order.id);
     notifiedArr.push(order.id);
-    localStorage.setItem('swiftcart_notified_orders', JSON.stringify(notifiedArr));
+    localStorage.setItem(NOTIFICATION_STORAGE_KEY, JSON.stringify(notifiedArr));
 
     toast.success(`Order #${order.id.slice(0, 8).toUpperCase()} Delivered!`, {
       description: `Your order totaling ₹${order.total_amount.toFixed(2)} has arrived.`,
@@ -98,8 +101,12 @@ export function OrderSimulationProvider({ children }: { children: React.ReactNod
         
         // Milestone 2: processing/pending → delivered
         if ((order.status === 'pending' || order.status === 'processing') && elapsed >= SIM_DELIVERED_MS) {
-          fireDeliveredNotification(order);
-          supabase.from('orders').update({ status: 'delivered' }).eq('id', order.id).then();
+          if (!notifiedOrdersRef.current.has(order.id)) {
+            // Gate both the notification AND the DB write behind the idempotency ref
+            // so we don't fire redundant Supabase updates every second until state clears.
+            fireDeliveredNotification(order); // adds order.id to notifiedOrdersRef internally
+            supabase.from('orders').update({ status: 'delivered' }).eq('id', order.id).then();
+          }
         }
       });
     }, 1000);
@@ -123,9 +130,11 @@ export function OrderSimulationProvider({ children }: { children: React.ReactNod
 
   /* On user login: request notification permission + subscribe to updates */
   useEffect(() => {
+    if (loading) return;
+
     if (!user) {
       setActiveOrders([]);
-      localStorage.removeItem('swiftcart_notified_orders');
+      localStorage.removeItem(NOTIFICATION_STORAGE_KEY);
       notifiedOrdersRef.current.clear();
       return;
     }
@@ -145,6 +154,15 @@ export function OrderSimulationProvider({ children }: { children: React.ReactNod
         if (data) {
           setActiveOrders(data as Order[]);
         }
+        // Warm up the in-memory Set from localStorage on every login/refresh so the
+        // fast-path check in fireDeliveredNotification is accurate from the first tick.
+        try {
+          const stored = localStorage.getItem(NOTIFICATION_STORAGE_KEY);
+          if (stored) {
+            const ids: string[] = JSON.parse(stored);
+            ids.forEach((id) => notifiedOrdersRef.current.add(id));
+          }
+        } catch { /* ignore corrupt storage */ }
       });
 
     // Realtime updates
@@ -162,12 +180,14 @@ export function OrderSimulationProvider({ children }: { children: React.ReactNod
             });
           } else if (payload.eventType === 'UPDATE') {
             const updated = payload.new as Order;
-            const oldRecord = payload.old as Order;
             
-            // Realtime is just a fallback for notifications if it wasn't triggered locally
-            if (updated.status === 'delivered' && oldRecord && oldRecord.status !== 'delivered') {
-              fireDeliveredNotification(updated);
-            } else if (updated.status === 'delivered' && !oldRecord) {
+            // Realtime is a fallback in case the interval didn't catch it (e.g. tab was
+            // in background). We unconditionally call fireDeliveredNotification here because
+            // idempotency is enforced inside that function via notifiedOrdersRef + localStorage.
+            // We intentionally do NOT check oldRecord.status: on page refresh Supabase sends
+            // payload.old as an empty object {}, making oldRecord.status === undefined and
+            // bypassing a !== 'delivered' guard — which was the root cause of duplicate notifications.
+            if (updated.status === 'delivered') {
               fireDeliveredNotification(updated);
             }
 
@@ -190,7 +210,7 @@ export function OrderSimulationProvider({ children }: { children: React.ReactNod
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, fireDeliveredNotification]);
+  }, [user, loading, fireDeliveredNotification]);
 
   return (
     <SimContext.Provider value={{ activeOrders, currentTick, scheduleNewOrder, cancelOrder }}>

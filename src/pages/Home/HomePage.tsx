@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Clock, Truck, Shield, ChevronRight, Navigation, X, XCircle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
-import { useAuth } from '../../context/AuthContext';
 import { useOrderSimulation } from '../../context/OrderSimulationContext';
 import { SIM_DELIVERED_MS } from '../../lib/simulationConfig';
 import type { Product, Order } from '../../types/database';
@@ -17,7 +16,6 @@ const HERO_FEATURES = [
 ];
 
 export default function HomePage() {
-  const { user } = useAuth();
   const { cancelOrder, activeOrders, currentTick } = useOrderSimulation();
   const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
-import { OrderSimulationProvider, useOrderSimulation } from './context/OrderSimulationContext';
+import { OrderSimulationProvider } from './context/OrderSimulationContext';
 import { Toaster } from 'sonner';
 import Navbar from './components/layout/Navbar';
 import CartDrawer from './components/shared/CartDrawer';
