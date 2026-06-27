@@ -16,6 +16,8 @@ export interface Profile {
   address: string | null;
   avatar_url: string | null;
   wallet_balance: number;
+  role?: 'customer' | 'admin' | 'manager';
+  is_banned?: boolean;
   created_at: string;
   updated_at: string;
 }

@@ -15,6 +15,11 @@ import ProfileSetupPage from './pages/Profile/ProfileSetupPage';
 import SettingsPage from './pages/Profile/SettingsPage';
 import OrderTrackingPage from './pages/OrderTracking/OrderTrackingPage';
 import MockUpiPage from './pages/MockUpiPage';
+import AdminProtectedRoute from './components/AdminProtectedRoute';
+import AdminLayout from './layouts/AdminLayout';
+import AdminDashboard from './pages/Admin/AdminDashboard';
+import AdminUsers from './pages/Admin/AdminUsers';
+import AdminSettings from './pages/Admin/AdminSettings';
 import { Zap } from 'lucide-react';
 
 function LoadingScreen() {
@@ -112,6 +117,15 @@ function AppLayout() {
             }
           />
           <Route path="/mock-payment" element={<MockUpiPage />} />
+          
+          <Route path="/admin" element={<AdminProtectedRoute />}>
+            <Route element={<AdminLayout />}>
+              <Route index element={<Navigate to="orders" replace />} />
+              <Route path="orders" element={<AdminDashboard />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="settings" element={<AdminSettings />} />
+            </Route>
+          </Route>
         </Routes>
       </main>
     </div>

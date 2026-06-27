@@ -15,7 +15,7 @@ interface AuthContextType {
   profile: Profile | null;
   loading: boolean;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
-  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signIn: (email: string, password: string) => Promise<{ data?: any, error: Error | null }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
@@ -32,11 +32,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select('id, full_name, phone, address, avatar_url, wallet_balance, role, is_banned, created_at, updated_at')
         .eq('id', userId)
         .single();
       
       if (!error && data) {
+        if (data.is_banned) {
+          // Immediate sign out and redirection for banned users
+          await supabase.auth.signOut();
+          setUser(null);
+          setSession(null);
+          setProfile(null);
+          if (window.location.pathname !== '/login') {
+            window.location.href = '/login';
+          }
+          return;
+        }
         setProfile(data);
       } else {
         setProfile(null);
@@ -69,17 +80,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
 
-      // Clear loading on the very first event — don't wait for profile fetch
-      if (!initialized) {
-        initialized = true;
-        setLoading(false);
-      }
-
-      // Fetch profile in the background without blocking loading
+      // Fetch profile before clearing the initial loading state
       if (session?.user) {
-        fetchProfile(session.user.id);
+        fetchProfile(session.user.id).finally(() => {
+          if (!initialized) {
+            initialized = true;
+            setLoading(false);
+          }
+        });
       } else {
         setProfile(null);
+        if (!initialized) {
+          initialized = true;
+          setLoading(false);
+        }
       }
     });
 
@@ -110,11 +124,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error: error as Error | null };
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    return { data, error: error as Error | null };
   };
 
   const signOut = async () => {
+    localStorage.removeItem('swiftcart_cart');
     await supabase.auth.signOut();
   };
 

@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Zap, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, Zap, ArrowRight, ShieldAlert } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { supabase } from '../../lib/supabase';
 
 export default function LoginPage() {
   const { signIn } = useAuth();
@@ -11,19 +12,41 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showBanNotification, setShowBanNotification] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    const { error } = await signIn(email, password);
-    if (error) {
-      setError(error.message);
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    
+    if (authError) {
+      setError(authError.message);
       setLoading(false);
-    } else {
-      navigate('/');
+      return;
     }
+
+    if (authData.user) {
+      // Immediately verify ban status
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_banned')
+        .eq('id', authData.user.id)
+        .single();
+
+      if (profile?.is_banned === true) {
+        await supabase.auth.signOut();
+        setShowBanNotification(true);
+        setLoading(false);
+        return;
+      }
+    }
+
+    navigate('/');
   };
 
   return (
@@ -117,6 +140,38 @@ export default function LoginPage() {
           </div>
         </form>
       </div>
+
+      {/* Ban Notification Modal */}
+      {showBanNotification && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="p-6 text-center space-y-4">
+              <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto border-4 border-red-50">
+                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                  <ShieldAlert className="w-6 h-6 text-red-600" />
+                </div>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900">Access Restricted</h3>
+                <p className="text-sm text-gray-500 mt-2">
+                  Your account is currently deactivated or banned.
+                </p>
+                <p className="text-sm text-gray-500 mt-1">
+                  Access is restricted. For more information, please contact support for account inquiries.
+                </p>
+              </div>
+            </div>
+            <div className="p-4 bg-gray-50 border-t border-gray-100">
+              <button
+                onClick={() => setShowBanNotification(false)}
+                className="w-full py-2.5 px-4 bg-white border border-gray-300 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 active:scale-[0.98] transition-all"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

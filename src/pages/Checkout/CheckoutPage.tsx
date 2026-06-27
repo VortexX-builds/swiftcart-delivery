@@ -40,33 +40,35 @@ export default function CheckoutPage() {
       image_url: i.product.image_url,
     }));
 
-    const { data, error } = await supabase
-      .from('orders')
-      .insert({
-        user_id: user.id,
-        total_amount: grandTotal,
-        status: 'pending',
-        cart_items: cartSnapshot,
-        // payment_method stored in local state only until DB column is added
-      })
-      .select('id, created_at')
-      .single();
+    let newOrderId: string;
+    try {
+      const { data, error } = await supabase.rpc('process_checkout', {
+        p_user_id: user.id,
+        p_cart_items: cartSnapshot,
+        p_total_amount: grandTotal
+      });
 
-    if (error) {
-      console.error('Order error:', error);
-      setOrderError('Something went wrong placing your order. Please try again.');
+      if (error) throw error;
+      newOrderId = data;
+    } catch (err: any) {
+      console.error('Order error:', err);
+      if (err.message?.includes('Out of stock')) {
+        setOrderError('One or more items in your cart are currently out of stock.');
+      } else {
+        setOrderError('Something went wrong placing your order. Please try again.');
+      }
       setStep('payment');
       return;
     }
 
-    setOrderId(data.id);
+    setOrderId(newOrderId);
     if (paymentMethod !== 'upi') {
       setStep('success');
     }
     clearCart();
     scheduleNewOrder({
-      id: data.id,
-      created_at: data.created_at,
+      id: newOrderId,
+      created_at: new Date().toISOString(),
       status: 'pending',
       total_amount: grandTotal,
       user_id: user.id,
@@ -74,7 +76,7 @@ export default function CheckoutPage() {
     } as import('../../types/database').Order);
 
     if (paymentMethod === 'upi') {
-      navigate(`/order-tracking/${data.id}`, { replace: true });
+      navigate(`/order-tracking/${newOrderId}`, { replace: true });
     }
   };
 

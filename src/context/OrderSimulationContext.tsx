@@ -41,7 +41,7 @@ export function OrderSimulationProvider({ children }: { children: React.ReactNod
   }, [activeOrders]);
 
   /* Fire browser + in-app notification */
-  const fireDeliveredNotification = useCallback((order: Order) => {
+  const fireDeliveredNotification = useCallback((order: Order, silent: boolean = false) => {
     // 1. In-memory deduplication (fast path)
     if (notifiedOrdersRef.current.has(order.id)) return;
     
@@ -65,20 +65,22 @@ export function OrderSimulationProvider({ children }: { children: React.ReactNod
     notifiedArr.push(order.id);
     localStorage.setItem(NOTIFICATION_STORAGE_KEY, JSON.stringify(notifiedArr));
 
-    toast.success(`Order #${order.id.slice(0, 8).toUpperCase()} Delivered!`, {
-      description: `Your order totaling ₹${order.total_amount.toFixed(2)} has arrived.`,
-      duration: 5000,
-    });
+    if (!silent) {
+      toast.success(`Order #${order.id.slice(0, 8).toUpperCase()} Delivered!`, {
+        description: `Your order totaling ₹${order.total_amount.toFixed(2)} has arrived.`,
+        duration: 5000,
+      });
 
-    if ('Notification' in window && Notification.permission === 'granted') {
-      try {
-        new Notification('🎉 Order Delivered!', {
-          body: `Order #${order.id.slice(0, 8).toUpperCase()} · ₹${order.total_amount.toFixed(2)} has arrived!`,
-          icon: '/vite.svg',
-          tag: `order-${order.id}`,
-        });
-      } catch (err) {
-        console.warn('Desktop notification failed:', err);
+      if ('Notification' in window && Notification.permission === 'granted') {
+        try {
+          new Notification('🎉 Order Delivered!', {
+            body: `Order #${order.id.slice(0, 8).toUpperCase()} · ₹${order.total_amount.toFixed(2)} has arrived!`,
+            icon: '/vite.svg',
+            tag: `order-${order.id}`,
+          });
+        } catch (err) {
+          console.warn('Desktop notification failed:', err);
+        }
       }
     }
   }, []);
@@ -101,18 +103,23 @@ export function OrderSimulationProvider({ children }: { children: React.ReactNod
         
         // Milestone 2: processing/pending → delivered
         if ((order.status === 'pending' || order.status === 'processing') && elapsed >= SIM_DELIVERED_MS) {
-          if (!notifiedOrdersRef.current.has(order.id)) {
-            // Gate both the notification AND the DB write behind the idempotency ref
-            // so we don't fire redundant Supabase updates every second until state clears.
-            fireDeliveredNotification(order); // adds order.id to notifiedOrdersRef internally
-            supabase.from('orders').update({ status: 'delivered' }).eq('id', order.id).then();
-          }
+          // Catch-Up Sync & Reconciliation Block
+          // Decouple the DB write from the notification gate to prevent permanent state desyncs.
+          // Optimistically remove from activeOrders to ensure DB update idempotency and prevent spam.
+          setActiveOrders((prev) => prev.filter((o) => o.id !== order.id));
+          
+          // Immediately execute Supabase update
+          supabase.from('orders').update({ status: 'delivered' }).eq('id', order.id).then();
+
+          // Fire notification (has its own internal idempotency check via notifiedOrdersRef)
+          const isCatchUp = elapsed > SIM_DELIVERED_MS + 10000; // 10s grace period
+          fireDeliveredNotification(order, isCatchUp);
         }
       });
     }, 1000);
     
     return () => clearInterval(interval);
-  }, [user]);
+  }, [user, fireDeliveredNotification]);
 
   /* Called by CheckoutPage right after a successful order insert */
   const scheduleNewOrder = useCallback((order: Order) => {
@@ -151,9 +158,6 @@ export function OrderSimulationProvider({ children }: { children: React.ReactNod
       .in('status', ['pending', 'processing'])
       .order('created_at', { ascending: false })
       .then(({ data }) => {
-        if (data) {
-          setActiveOrders(data as Order[]);
-        }
         // Warm up the in-memory Set from localStorage on every login/refresh so the
         // fast-path check in fireDeliveredNotification is accurate from the first tick.
         try {
@@ -163,6 +167,26 @@ export function OrderSimulationProvider({ children }: { children: React.ReactNod
             ids.forEach((id) => notifiedOrdersRef.current.add(id));
           }
         } catch { /* ignore corrupt storage */ }
+
+        if (data) {
+          const now = Date.now();
+          const validOrders: Order[] = [];
+          
+          data.forEach((order) => {
+            const elapsed = now - new Date(order.created_at).getTime();
+            
+            // Reconciliation Block: Catch-Up Sync on Component Mount
+            if ((order.status === 'pending' || order.status === 'processing') && elapsed >= SIM_DELIVERED_MS) {
+              // Instantly catch stale database state
+              supabase.from('orders').update({ status: 'delivered' }).eq('id', order.id).then();
+              fireDeliveredNotification(order, true); // true = silent catch-up
+            } else {
+              validOrders.push(order);
+            }
+          });
+          
+          setActiveOrders(validOrders);
+        }
       });
 
     // Realtime updates
@@ -188,7 +212,9 @@ export function OrderSimulationProvider({ children }: { children: React.ReactNod
             // payload.old as an empty object {}, making oldRecord.status === undefined and
             // bypassing a !== 'delivered' guard — which was the root cause of duplicate notifications.
             if (updated.status === 'delivered') {
-              fireDeliveredNotification(updated);
+              const elapsed = Date.now() - new Date(updated.created_at).getTime();
+              const isCatchUp = elapsed > SIM_DELIVERED_MS + 10000;
+              fireDeliveredNotification(updated, isCatchUp);
             }
 
             setActiveOrders((prev) => {
