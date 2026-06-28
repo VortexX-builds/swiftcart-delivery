@@ -52,8 +52,8 @@ export default function CheckoutPage() {
       newOrderId = data;
     } catch (err: any) {
       console.error('Order error:', err);
-      if (err.message?.includes('Out of stock')) {
-        setOrderError('One or more items in your cart are currently out of stock.');
+      if (err.message?.includes('Out of stock') || err.message?.includes('Insufficient stock')) {
+        setOrderError('Checkout failed: One or more items in your cart exceed available stock. Please adjust quantities.');
       } else {
         setOrderError('Something went wrong placing your order. Please try again.');
       }
@@ -230,6 +230,9 @@ export default function CheckoutPage() {
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-gray-900 truncate">{product.name}</p>
                         <p className="text-sm text-brand font-bold">₹{product.price}</p>
+                        {quantity >= product.stock && (
+                          <p className="text-[10px] font-bold text-red-500 mt-0.5">Max stock reached</p>
+                        )}
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="flex items-center gap-1 bg-gray-50 rounded-lg">
@@ -247,10 +250,22 @@ export default function CheckoutPage() {
                               <Minus className="w-3.5 h-3.5 text-gray-500" />
                             )}
                           </button>
-                          <span className="w-6 text-center text-sm font-bold text-gray-900">{quantity}</span>
+                          <input
+                            type="number"
+                            value={quantity}
+                            onChange={(e) => {
+                              const val = parseInt(e.target.value, 10);
+                              if (isNaN(val) || val < 1) return;
+                              updateQuantity(product.id, val > product.stock ? product.stock : val);
+                            }}
+                            className="w-8 text-center text-sm font-bold text-gray-900 bg-transparent outline-none appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          />
                           <button
                             onClick={() => updateQuantity(product.id, quantity + 1)}
-                            className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-gray-200 transition-colors"
+                            disabled={quantity >= product.stock}
+                            className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${
+                              quantity >= product.stock ? 'opacity-50 cursor-not-allowed bg-gray-100' : 'hover:bg-gray-200'
+                            }`}
                           >
                             <Plus className="w-3.5 h-3.5 text-gray-500" />
                           </button>

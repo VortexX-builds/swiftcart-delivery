@@ -77,10 +77,22 @@ export default function ProductCard({ product }: ProductCardProps) {
                   >
                     <Minus className="w-4 h-4" />
                   </button>
-                  <span className="w-4 text-center text-sm font-bold text-white">{quantity}</span>
+                  <input
+                    type="number"
+                    value={quantity}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value, 10);
+                      if (isNaN(val) || val < 1) return;
+                      updateQuantity(product.id, val > product.stock ? product.stock : val);
+                    }}
+                    className="w-6 text-center text-sm font-bold text-white bg-transparent outline-none appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
                   <button
                     onClick={() => updateQuantity(product.id, quantity + 1)}
-                    className="w-10 h-10 flex items-center justify-center text-white hover:bg-gray-800 transition-colors active:scale-90"
+                    disabled={quantity >= product.stock}
+                    className={`w-10 h-10 flex items-center justify-center text-white transition-colors active:scale-90 ${
+                      quantity >= product.stock ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-800'
+                    }`}
                   >
                     <Plus className="w-4 h-4" />
                   </button>
@@ -89,6 +101,12 @@ export default function ProductCard({ product }: ProductCardProps) {
             </>
           )}
         </div>
+        
+        {quantity >= product.stock && !outOfStock && quantity > 0 && (
+          <p className="text-[10px] font-bold text-red-500 mt-2 text-right">
+            Max stock reached
+          </p>
+        )}
       </div>
     </div>
   );

@@ -81,6 +81,9 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-bold text-gray-900 truncate">{product.name}</p>
                       <p className="text-sm font-black text-black mt-0.5">₹{product.price}</p>
+                      {quantity >= product.stock && (
+                        <p className="text-[10px] font-bold text-red-500 mt-0.5">Max stock reached</p>
+                      )}
                     </div>
 
                     {/* Quantity Controls */}
@@ -95,10 +98,22 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                       >
                         <Minus className="w-3.5 h-3.5" />
                       </button>
-                      <span className="w-6 text-center text-xs font-bold text-white">{quantity}</span>
+                      <input
+                        type="number"
+                        value={quantity}
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value, 10);
+                          if (isNaN(val) || val < 1) return;
+                          updateQuantity(product.id, val > product.stock ? product.stock : val);
+                        }}
+                        className="w-8 text-center text-xs font-bold text-white bg-transparent outline-none appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      />
                       <button
                         onClick={() => updateQuantity(product.id, quantity + 1)}
-                        className="w-7 h-7 rounded-full flex items-center justify-center text-white hover:bg-gray-800 transition-colors"
+                        disabled={quantity >= product.stock}
+                        className={`w-7 h-7 rounded-full flex items-center justify-center text-white transition-colors ${
+                          quantity >= product.stock ? 'opacity-50 cursor-not-allowed bg-gray-500 hover:bg-gray-500' : 'hover:bg-gray-800'
+                        }`}
                       >
                         <Plus className="w-3.5 h-3.5" />
                       </button>
