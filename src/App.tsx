@@ -20,6 +20,8 @@ import AdminLayout from './layouts/AdminLayout';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import AdminUsers from './pages/Admin/AdminUsers';
 import AdminSettings from './pages/Admin/AdminSettings';
+import MaintenanceView from './pages/Maintenance/MaintenanceView';
+import { useMaintenance } from './hooks/useMaintenance';
 import { Zap } from 'lucide-react';
 
 function LoadingScreen() {
@@ -49,7 +51,18 @@ function AppLayout() {
   const [cartOpen, setCartOpen] = useState(false);
   const location = useLocation();
 
-  if (loading) return <LoadingScreen />;
+  // ── Maintenance mode check ─────────────────────────────────────────────
+  const { isMaintenanceMode, isCheckingMaintenance } = useMaintenance();
+
+  if (loading || isCheckingMaintenance) return <LoadingScreen />;
+
+  // Block all non-admin routes when maintenance mode is enabled.
+  // Admin routes are deliberately excluded so admins can always
+  // log in and disable maintenance mode without being locked out.
+  const isAdminRoute = location.pathname.startsWith('/admin');
+  if (isMaintenanceMode && !isAdminRoute) {
+    return <MaintenanceView />;
+  }
 
   // Profile completion check
   const isProfileIncomplete = user && profile && (!profile.full_name || !profile.phone || !profile.address);

@@ -46,3 +46,36 @@ USING (
 WITH CHECK (
   (SELECT role FROM profiles WHERE id = auth.uid()) = 'admin'
 );
+
+-- 4. Setup Global Store Settings Table
+CREATE TABLE IF NOT EXISTS store_settings (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  maintenance_mode boolean DEFAULT false,
+  tax_rate numeric DEFAULT 0.0,
+  support_email text DEFAULT 'support@swiftcart.com'
+);
+
+-- Insert a default row if the table is empty
+INSERT INTO store_settings (maintenance_mode, tax_rate, support_email)
+SELECT false, 18.0, 'support@swiftcart.com'
+WHERE NOT EXISTS (SELECT 1 FROM store_settings);
+
+-- Enable RLS
+ALTER TABLE store_settings ENABLE ROW LEVEL SECURITY;
+
+-- Everyone can read store settings
+CREATE POLICY "Anyone can view store settings"
+ON store_settings FOR SELECT
+TO public
+USING (true);
+
+-- Only admins can update store settings
+CREATE POLICY "Admins can update store settings"
+ON store_settings FOR UPDATE
+TO authenticated
+USING (
+  (SELECT role FROM profiles WHERE id = auth.uid()) = 'admin'
+)
+WITH CHECK (
+  (SELECT role FROM profiles WHERE id = auth.uid()) = 'admin'
+);
