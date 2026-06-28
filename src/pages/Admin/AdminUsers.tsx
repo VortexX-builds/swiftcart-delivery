@@ -107,14 +107,14 @@ export default function AdminUsers() {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      <div className="p-4 sm:p-6 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gray-50/50">
-        <h2 className="text-lg font-semibold text-gray-900 whitespace-nowrap">Users Management</h2>
+    <div className="bg-brand-surface rounded-xl border border-slate-800 overflow-hidden">
+      <div className="p-4 sm:p-6 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-brand-surface">
+        <h2 className="text-lg font-semibold text-slate-100 whitespace-nowrap">Users Management</h2>
         
         <button 
           onClick={fetchUsers}
           disabled={isLoading}
-          className="inline-flex items-center justify-center gap-2 text-sm px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium text-gray-700 shadow-sm disabled:opacity-50"
+          className="inline-flex items-center justify-center gap-2 text-sm px-4 py-2 bg-brand-surface border border-slate-700 rounded-lg hover:bg-slate-800 transition-colors font-medium text-slate-200 shadow-none disabled:opacity-50"
         >
           <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
           Refresh Data
@@ -124,7 +124,7 @@ export default function AdminUsers() {
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse min-w-[750px]">
           <thead>
-            <tr className="bg-gray-50 border-b border-gray-200 text-xs uppercase tracking-wider text-gray-500">
+            <tr className="bg-slate-800/50 border-b border-slate-800 text-xs uppercase tracking-wider text-slate-400">
               <th className="px-6 py-4 font-medium w-[15%]">User ID</th>
               <th className="px-6 py-4 font-medium w-[20%]">Name</th>
               <th className="px-6 py-4 font-medium w-[20%]">Email</th>
@@ -133,29 +133,29 @@ export default function AdminUsers() {
               <th className="px-6 py-4 font-medium text-right w-[20%]">Action</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody className="divide-y divide-slate-800">
             {isLoading ? (
               // Loading Skeleton
               Array.from({ length: 5 }).map((_, i) => (
                 <tr key={i} className="animate-pulse">
                   <td className="px-6 py-4">
-                    <div className="h-4 bg-gray-200 rounded w-20"></div>
+                    <div className="h-4 bg-slate-700 rounded w-20"></div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="h-4 bg-gray-200 rounded w-32"></div>
+                    <div className="h-4 bg-slate-700 rounded w-32"></div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="h-4 bg-gray-200 rounded w-40"></div>
+                    <div className="h-4 bg-slate-700 rounded w-40"></div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="h-6 bg-gray-200 rounded-full w-16"></div>
+                    <div className="h-6 bg-slate-700 rounded-full w-16"></div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="h-6 bg-gray-200 rounded-full w-14"></div>
+                    <div className="h-6 bg-slate-700 rounded-full w-14"></div>
                   </td>
                   <td className="px-6 py-4 flex justify-end gap-2">
-                    <div className="h-8 bg-gray-200 rounded-lg w-20"></div>
-                    <div className="h-8 bg-gray-200 rounded-lg w-24"></div>
+                    <div className="h-8 bg-slate-700 rounded-lg w-20"></div>
+                    <div className="h-8 bg-slate-700 rounded-lg w-24"></div>
                   </td>
                 </tr>
               ))
@@ -170,27 +170,27 @@ export default function AdminUsers() {
               </tr>
             ) : users.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                <td colSpan={6} className="px-6 py-12 text-center text-slate-400">
                   No users found in the system.
                 </td>
               </tr>
             ) : (
               users.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-50/50 transition-colors">
-                  <td className="px-6 py-4 text-sm text-gray-900 font-mono">
+                <tr key={user.id} className="hover:bg-slate-800/50 transition-colors">
+                  <td className="px-6 py-4 text-sm text-slate-100 font-mono">
                     {user.id.slice(0, 8)}...
                   </td>
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                  <td className="px-6 py-4 text-sm font-medium text-slate-100">
                     {user.full_name || 'N/A'}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-500 truncate max-w-[180px]" title={user.email}>
+                  <td className="px-6 py-4 text-sm text-slate-400 truncate max-w-[180px]" title={user.email}>
                     {user.email || 'N/A'}
                   </td>
                   <td className="px-6 py-4 text-sm">
                     <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium capitalize border ${
                       user.role === 'admin' 
-                        ? 'bg-purple-50 text-purple-700 border-purple-200' 
-                        : 'bg-blue-50 text-blue-700 border-blue-200'
+                        ? 'bg-purple-900/30 text-purple-400 border-purple-800/50' 
+                        : 'bg-blue-900/30 text-blue-400 border-blue-800/50'
                     }`}>
                       {user.role === 'admin' ? <Shield className="w-3 h-3" /> : <User className="w-3 h-3" />}
                       {user.role}
@@ -199,8 +199,8 @@ export default function AdminUsers() {
                   <td className="px-6 py-4 text-sm">
                     <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${
                       user.is_banned
-                        ? 'bg-red-50 text-red-700 border-red-200'
-                        : 'bg-green-50 text-green-700 border-green-200'
+                        ? 'bg-red-900/30 text-red-400 border-red-800/50'
+                        : 'bg-emerald-900/30 text-emerald-400 border-emerald-800/50'
                     }`}>
                       {user.is_banned ? 'Banned' : 'Active'}
                     </span>
@@ -211,8 +211,8 @@ export default function AdminUsers() {
                       disabled={banningId === user.id}
                       className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors disabled:opacity-50 whitespace-nowrap ${
                         user.is_banned
-                          ? 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-                          : 'bg-white text-red-600 border border-red-200 hover:bg-red-50'
+                          ? 'bg-brand-surface text-slate-300 border border-slate-700 hover:bg-slate-800'
+                          : 'bg-brand-surface text-red-400 border border-red-900/50 hover:bg-red-900/20'
                       }`}
                     >
                       {user.is_banned ? 'Unban' : 'Ban User'}
@@ -222,10 +222,10 @@ export default function AdminUsers() {
                       value={user.role}
                       onChange={(e) => handleRoleChange(user.id, e.target.value)}
                       disabled={updatingId === user.id}
-                      className={`inline-block w-full max-w-[110px] px-3 py-1.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand transition-colors cursor-pointer appearance-none ${
-                        updatingId === user.id ? 'opacity-50 cursor-not-allowed bg-gray-50' : 'hover:bg-gray-50'
+                      className={`inline-block w-full max-w-[110px] px-3 py-1.5 border border-slate-700 rounded-lg text-sm bg-brand-dark text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-accent focus:border-brand-accent transition-colors cursor-pointer appearance-none ${
+                        updatingId === user.id ? 'opacity-50 cursor-not-allowed bg-slate-800' : 'hover:bg-slate-800'
                       }`}
-                      style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.2em 1.2em', paddingRight: '2rem' }}
+                      style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.2em 1.2em', paddingRight: '2rem' }}
                     >
                       <option value="customer">User</option>
                       <option value="admin">Admin</option>

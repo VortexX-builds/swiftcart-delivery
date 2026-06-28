@@ -53,17 +53,17 @@ export default function SignupPage() {
       <div className="w-full max-w-md">
         {/* Logo / Header */}
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-brand flex items-center justify-center mx-auto mb-4 shadow-lg shadow-brand/25">
-            <Zap className="w-7 h-7 text-white" strokeWidth={2.5} />
+          <div className="w-16 h-16 rounded-[24px] bg-[#FFBE0B] flex items-center justify-center mx-auto mb-5 shadow-xl shadow-[#FFBE0B]/30 border-2 border-black/5">
+            <Zap className="w-8 h-8 text-black" strokeWidth={3} />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Create your account</h1>
-          <p className="text-gray-400 mt-1 text-sm">Get groceries delivered in minutes</p>
+          <h1 className="text-3xl font-black text-gray-900 tracking-tight">Create your account</h1>
+          <p className="text-gray-500 font-bold mt-2 text-sm">Get groceries delivered in minutes</p>
         </div>
 
         {/* Form Card */}
         <form
           onSubmit={handleSubmit}
-          className="bg-white rounded-3xl shadow-xl shadow-black/5 border border-gray-100 p-8 space-y-5"
+          className="bg-white rounded-[32px] shadow-2xl shadow-black/5 border-2 border-gray-100 p-8 space-y-6"
         >
           {error && (
             <div className="bg-red-50 text-red-600 text-sm font-medium px-4 py-3 rounded-xl border border-red-100">
@@ -83,7 +83,7 @@ export default function SignupPage() {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               placeholder="John Doe"
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-brand focus:ring-2 focus:ring-brand/10 transition-all duration-200"
+              className="w-full px-5 py-4 rounded-2xl border-2 border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 placeholder-gray-400 outline-none focus:border-black focus:bg-white transition-all duration-300"
             />
           </div>
 
@@ -99,7 +99,7 @@ export default function SignupPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-brand focus:ring-2 focus:ring-brand/10 transition-all duration-200"
+              className="w-full px-5 py-4 rounded-2xl border-2 border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 placeholder-gray-400 outline-none focus:border-black focus:bg-white transition-all duration-300"
             />
           </div>
 
@@ -116,7 +116,7 @@ export default function SignupPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="At least 6 characters"
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-brand focus:ring-2 focus:ring-brand/10 transition-all duration-200 pr-11"
+                className="w-full px-5 py-4 rounded-2xl border-2 border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 placeholder-gray-400 outline-none focus:border-black focus:bg-white transition-all duration-300 pr-11"
               />
               <button
                 type="button"
@@ -151,7 +151,7 @@ export default function SignupPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex items-center justify-center gap-2 bg-brand text-white py-3 rounded-xl text-sm font-bold hover:bg-brand-dark active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg shadow-brand/25"
+            className="w-full flex items-center justify-center gap-2 bg-black text-white py-4 rounded-full text-sm font-bold hover:bg-gray-800 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-xl shadow-black/20"
           >
             {loading ? (
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

@@ -193,10 +193,10 @@ export default function OrderTrackingPage() {
               onClick={canCancel ? handleCancel : undefined}
               disabled={!canCancel || cancelling}
               title={!canCancel ? "Cannot cancel once the order is on the way." : undefined}
-              className={`flex items-center gap-1.5 border text-xs font-bold px-3 py-1.5 rounded-full transition-all ${
+              className={`flex items-center gap-1.5 border-2 text-xs font-bold px-4 py-2 rounded-full transition-all ${
                 canCancel 
-                  ? "bg-red-50 text-red-500 border-red-200 hover:bg-red-100 active:scale-95" 
-                  : "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-60"
+                  ? "bg-white text-red-500 border-red-500 hover:bg-red-50 active:scale-95 shadow-sm" 
+                  : "bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed opacity-60"
               }`}
             >
               <XCircle className="w-3.5 h-3.5" />
@@ -208,13 +208,13 @@ export default function OrderTrackingPage() {
 
       {/* Cancelled state */}
       {isCancelled && (
-        <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-center mb-6">
+        <div className="bg-red-500 rounded-[32px] p-8 text-center mb-8 shadow-xl shadow-red-500/20 text-white">
           <div className="text-4xl mb-3">❌</div>
-          <p className="font-bold text-red-700 text-lg">Order Cancelled</p>
-          <p className="text-sm text-red-400 mt-1">Your order has been cancelled successfully.</p>
+          <p className="font-black text-2xl tracking-tight">Order Cancelled</p>
+          <p className="text-white/80 font-bold mt-2">Your order has been cancelled successfully.</p>
           <button
             onClick={() => navigate('/')}
-            className="mt-4 bg-white text-red-500 border border-red-200 px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-red-50 transition-colors"
+            className="mt-6 bg-white text-red-600 px-8 py-3.5 rounded-full text-sm font-bold hover:bg-gray-50 active:scale-95 transition-all shadow-md inline-block"
           >
             Back to Shopping
           </button>
@@ -258,15 +258,15 @@ export default function OrderTrackingPage() {
 
             {isDelivered && (
               <div
-                className="bg-brand rounded-2xl p-5 text-white text-center shadow-lg shadow-brand/25"
+                className="bg-[#00E676] rounded-[32px] p-8 text-black text-center shadow-xl shadow-[#00E676]/20"
                 style={{ animation: 'scaleIn 300ms cubic-bezier(0.34,1.56,0.64,1)' }}
               >
-                <div className="text-3xl mb-2">🎉</div>
-                <p className="font-bold text-lg">Delivered!</p>
-                <p className="text-white/80 text-xs mt-1">Thank you for ordering with SwiftCart</p>
+                <div className="text-4xl mb-3">🎉</div>
+                <p className="font-black text-2xl tracking-tight">Delivered!</p>
+                <p className="text-black/80 text-sm font-bold mt-2">Thank you for ordering with SwiftCart</p>
                 <button
                   onClick={() => navigate('/')}
-                  className="mt-4 w-full bg-white text-brand py-2.5 rounded-xl text-sm font-bold hover:bg-white/90 active:scale-[0.97] transition-all"
+                  className="mt-6 w-full bg-black text-white py-3.5 rounded-full text-sm font-bold hover:bg-gray-800 active:scale-[0.97] transition-all shadow-lg"
                 >
                   Continue Shopping
                 </button>

@@ -85,8 +85,8 @@ export default function AdminSettings() {
   if (isLoading) {
     return (
       <div className="flex flex-col justify-center items-center h-full text-center py-20">
-        <div className="w-10 h-10 border-4 border-gray-200 border-t-brand rounded-full animate-spin mb-4"></div>
-        <p className="text-gray-500 font-medium">Loading platform settings...</p>
+        <div className="w-10 h-10 border-4 border-slate-700 border-t-brand-accent rounded-full animate-spin mb-4"></div>
+        <p className="text-slate-400 font-medium">Loading platform settings...</p>
       </div>
     );
   }
@@ -94,26 +94,26 @@ export default function AdminSettings() {
   return (
     <div className="max-w-4xl mx-auto pb-10">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-          <div className="p-2 bg-brand/10 rounded-lg">
-            <Settings className="w-6 h-6 text-brand" />
+        <h2 className="text-2xl font-bold text-slate-100 flex items-center gap-3">
+          <div className="p-2 bg-brand-accent/10 rounded-lg">
+            <Settings className="w-6 h-6 text-brand-accent" />
           </div>
           Platform Settings
         </h2>
-        <p className="text-gray-500 mt-2">Manage global configuration, financials, and maintenance mode for the SwiftCart platform.</p>
+        <p className="text-slate-400 mt-2">Manage global configuration, financials, and maintenance mode for the SwiftCart platform.</p>
       </div>
 
       <form onSubmit={handleSaveSettings} className="space-y-6">
         
         {/* General Settings */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50/50 flex items-center gap-2">
-            <Wrench className="w-5 h-5 text-gray-500" />
-            <h3 className="text-lg font-semibold text-gray-900">General Settings</h3>
+        <div className="bg-brand-surface rounded-xl border border-slate-800 overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-800 bg-brand-surface flex items-center gap-2">
+            <Wrench className="w-5 h-5 text-slate-400" />
+            <h3 className="text-lg font-semibold text-slate-100">General Settings</h3>
           </div>
           <div className="p-6">
             <div className="max-w-xl">
-              <label htmlFor="support_email" className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label htmlFor="support_email" className="block text-sm font-medium text-slate-300 mb-1.5">
                 Support Email Address
               </label>
               <input
@@ -121,24 +121,24 @@ export default function AdminSettings() {
                 id="support_email"
                 value={settings.support_email}
                 onChange={(e) => setSettings({ ...settings, support_email: e.target.value })}
-                className="block w-full px-4 py-2.5 text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-brand sm:text-sm transition-colors shadow-sm"
+                className="block w-full px-4 py-2.5 text-slate-100 bg-brand-dark border border-slate-700 rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-brand-accent sm:text-sm transition-colors shadow-none"
                 placeholder="support@swiftcart.com"
                 required
               />
-              <p className="mt-2 text-sm text-gray-500">This email will be displayed to customers for support inquiries.</p>
+              <p className="mt-2 text-sm text-slate-400">This email will be displayed to customers for support inquiries.</p>
             </div>
           </div>
         </div>
 
         {/* Financials */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50/50 flex items-center gap-2">
-            <DollarSign className="w-5 h-5 text-gray-500" />
-            <h3 className="text-lg font-semibold text-gray-900">Financials</h3>
+        <div className="bg-brand-surface rounded-xl border border-slate-800 overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-800 bg-brand-surface flex items-center gap-2">
+            <DollarSign className="w-5 h-5 text-slate-400" />
+            <h3 className="text-lg font-semibold text-slate-100">Financials</h3>
           </div>
           <div className="p-6">
             <div className="max-w-xl">
-              <label htmlFor="tax_rate" className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label htmlFor="tax_rate" className="block text-sm font-medium text-slate-300 mb-1.5">
                 Global Tax Rate (%)
               </label>
               <div className="relative">
@@ -150,29 +150,29 @@ export default function AdminSettings() {
                   max="100"
                   value={settings.tax_rate}
                   onChange={(e) => setSettings({ ...settings, tax_rate: parseFloat(e.target.value) || 0 })}
-                  className="block w-full pl-4 pr-12 py-2.5 text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-brand sm:text-sm transition-colors shadow-sm"
+                  className="block w-full pl-4 pr-12 py-2.5 text-slate-100 bg-brand-dark border border-slate-700 rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-brand-accent sm:text-sm transition-colors shadow-none"
                   required
                 />
                 <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                  <span className="text-gray-500 sm:text-sm font-medium">%</span>
+                  <span className="text-slate-400 sm:text-sm font-medium">%</span>
                 </div>
               </div>
-              <p className="mt-2 text-sm text-gray-500">Default tax rate applied to all orders at checkout.</p>
+              <p className="mt-2 text-sm text-slate-400">Default tax rate applied to all orders at checkout.</p>
             </div>
           </div>
         </div>
 
         {/* Danger Zone */}
-        <div className="bg-white rounded-xl shadow-sm border border-red-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-red-100 bg-red-50/50 flex items-center gap-2">
-            <ShieldAlert className="w-5 h-5 text-red-600" />
-            <h3 className="text-lg font-semibold text-red-800">Danger Zone</h3>
+        <div className="bg-brand-surface rounded-xl border border-red-900/50 overflow-hidden">
+          <div className="px-6 py-4 border-b border-red-900/50 bg-red-900/10 flex items-center gap-2">
+            <ShieldAlert className="w-5 h-5 text-red-400" />
+            <h3 className="text-lg font-semibold text-red-400">Danger Zone</h3>
           </div>
           <div className="p-6">
             <div className="flex items-center justify-between">
               <div className="max-w-xl">
-                <h4 className="text-base font-medium text-gray-900 mb-1">Maintenance Mode</h4>
-                <p className="text-sm text-gray-500">Enable this to prevent customers from placing new orders while you perform system updates or maintenance.</p>
+                <h4 className="text-base font-medium text-slate-100 mb-1">Maintenance Mode</h4>
+                <p className="text-sm text-slate-400">Enable this to prevent customers from placing new orders while you perform system updates or maintenance.</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer ml-4">
                 <input 
@@ -181,7 +181,7 @@ export default function AdminSettings() {
                   checked={settings.maintenance_mode}
                   onChange={(e) => setSettings({ ...settings, maintenance_mode: e.target.checked })}
                 />
-                <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-200 rounded-full peer transition-colors duration-300 ease-in-out peer-checked:bg-red-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-6 after:w-6 after:shadow-[0_2px_4px_rgba(0,0,0,0.25)] after:transition-transform after:duration-300 after:ease-in-out peer-checked:after:translate-x-7"></div>
+                <div className="w-14 h-7 bg-slate-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-900/50 rounded-full peer transition-colors duration-300 ease-in-out peer-checked:bg-red-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-6 after:w-6 after:shadow-[0_2px_4px_rgba(0,0,0,0.25)] after:transition-transform after:duration-300 after:ease-in-out peer-checked:after:translate-x-7"></div>
               </label>
             </div>
           </div>
@@ -190,14 +190,14 @@ export default function AdminSettings() {
         {/* Submit Actions */}
         <div className="flex items-center justify-end gap-4 pt-2">
           {successMessage && (
-            <span className="text-sm font-medium text-green-700 bg-green-50 px-4 py-2 rounded-lg border border-green-100 animate-in fade-in slide-in-from-right-4 duration-300">
+            <span className="text-sm font-medium text-emerald-400 bg-emerald-900/30 px-4 py-2 rounded-lg border border-emerald-800/50 animate-in fade-in slide-in-from-right-4 duration-300">
               Settings saved successfully
             </span>
           )}
           <button
             type="submit"
             disabled={isSaving || !settings.id}
-            className="flex items-center gap-2 px-6 py-2.5 text-sm font-medium text-white bg-brand rounded-lg hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+            className="flex items-center gap-2 px-6 py-2.5 text-sm font-medium text-white bg-brand-accent rounded-lg hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-brand-dark focus:ring-brand-accent disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-none"
           >
             {isSaving ? (
               <>

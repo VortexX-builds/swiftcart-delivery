@@ -1,23 +1,21 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand: #0c831f; 
-  --color-brand-dark: #0a6b18;
-  --color-accent: #ffc200;
-  
+  /* ── Brand tokens ────────────────────────────────── */
+  --color-brand-dark: #09090b;    /* zinc-950 — admin main bg */
+  --color-brand-surface: #18181b; /* zinc-900 — admin cards   */
+  --color-brand-accent: #10B981;  /* emerald-500 — CTA green  */
+  --color-brand: #0c831f;         /* consumer primary green   */
+  --color-accent: #ffc200;        /* warm yellow accent       */
+
   --font-sans: 'Outfit', 'Inter', system-ui, sans-serif;
 }
 
 @layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --border: 214.3 31.8% 91.4%;
-  }
-
   body {
-    background-color: #f3f4f6; /* bg-gray-100 */
-    color: hsl(var(--foreground));
+    /* Neutral reset — each layout sets its own bg */
+    background-color: #f8fafc; /* slate-50: consumer default */
+    color: #0f172a;            /* slate-900 */
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }

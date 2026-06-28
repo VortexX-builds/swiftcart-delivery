@@ -15,13 +15,13 @@ export default function ProductCard({ product }: ProductCardProps) {
   const outOfStock = product.stock <= 0;
 
   return (
-    <div className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-lg hover:shadow-black/5 hover:-translate-y-0.5 transition-all duration-300">
+    <div className="group bg-white rounded-[24px] border border-gray-100/60 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.06)] hover:-translate-y-1.5 transition-all duration-400 ease-out">
       {/* Image */}
-      <div className="relative aspect-square bg-gray-50 overflow-hidden">
+      <div className="relative aspect-square bg-gray-50/50 overflow-hidden">
         <img
           src={(!product.image_url || imgError) ? '/placeholder.png' : product.image_url}
           alt={product.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
           loading="lazy"
           onError={() => setImgError(true)}
         />
@@ -60,27 +60,27 @@ export default function ProductCard({ product }: ProductCardProps) {
               {quantity === 0 ? (
                 <button
                   onClick={() => addItem(product)}
-                  className="flex items-center gap-1.5 bg-brand/10 text-brand px-3.5 py-1.5 rounded-xl text-sm font-bold hover:bg-brand hover:text-white active:scale-95 transition-all duration-200"
+                  className="flex items-center gap-1.5 bg-black hover:bg-gray-800 text-white px-5 py-2.5 rounded-full text-sm font-bold shadow-lg shadow-black/20 active:scale-[0.95] transition-all duration-300"
                 >
                   <Plus className="w-4 h-4" />
                   ADD
                 </button>
               ) : (
-                <div className="flex items-center gap-1 bg-brand rounded-xl overflow-hidden shadow-md shadow-brand/20">
+                <div className="flex items-center gap-1 bg-black rounded-full overflow-hidden shadow-lg shadow-black/20">
                   <button
                     onClick={() =>
                       quantity === 1
                         ? removeItem(product.id)
                         : updateQuantity(product.id, quantity - 1)
                     }
-                    className="w-8 h-8 flex items-center justify-center text-white hover:bg-brand-dark transition-colors"
+                    className="w-10 h-10 flex items-center justify-center text-white hover:bg-gray-800 transition-colors active:scale-90"
                   >
                     <Minus className="w-4 h-4" />
                   </button>
-                  <span className="w-6 text-center text-sm font-bold text-white">{quantity}</span>
+                  <span className="w-4 text-center text-sm font-bold text-white">{quantity}</span>
                   <button
                     onClick={() => updateQuantity(product.id, quantity + 1)}
-                    className="w-8 h-8 flex items-center justify-center text-white hover:bg-brand-dark transition-colors"
+                    className="w-10 h-10 flex items-center justify-center text-white hover:bg-gray-800 transition-colors active:scale-90"
                   >
                     <Plus className="w-4 h-4" />
                   </button>

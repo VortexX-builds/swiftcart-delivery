@@ -52,8 +52,8 @@ export default function StatusTimeline({ currentStatus }: StatusTimelineProps) {
               <div className="flex flex-col items-center">
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-500
-                    ${isDone ? 'bg-brand text-white shadow-md shadow-brand/25' : ''}
-                    ${isActive ? 'bg-brand text-white shadow-lg shadow-brand/40 ring-4 ring-brand/20' : ''}
+                    ${isDone ? 'bg-black text-white shadow-md shadow-black/25' : ''}
+                    ${isActive ? 'bg-black text-white shadow-lg shadow-black/40 ring-4 ring-black/10' : ''}
                     ${isPending ? 'bg-gray-100 text-gray-300' : ''}
                   `}
                 >
@@ -72,7 +72,7 @@ export default function StatusTimeline({ currentStatus }: StatusTimelineProps) {
                 {index < STEPS.length - 1 && (
                   <div
                     className={`w-0.5 flex-1 min-h-[28px] my-1 rounded-full transition-colors duration-700
-                      ${index < currentStatus ? 'bg-brand' : 'bg-gray-100'}
+                      ${index < currentStatus ? 'bg-black' : 'bg-gray-100'}
                     `}
                   />
                 )}
@@ -81,15 +81,15 @@ export default function StatusTimeline({ currentStatus }: StatusTimelineProps) {
               {/* Text column */}
               <div className="pb-5 pt-1 flex-1 min-w-0">
                 <p
-                  className={`text-sm font-bold transition-colors duration-300
-                    ${isActive ? 'text-brand' : isDone ? 'text-gray-900' : 'text-gray-300'}
+                  className={`text-sm font-black transition-colors duration-300
+                    ${isActive ? 'text-black' : isDone ? 'text-gray-900' : 'text-gray-300'}
                   `}
                 >
                   {step.label}
                 </p>
                 <p
-                  className={`text-xs mt-0.5 transition-colors duration-300
-                    ${isActive ? 'text-brand/70' : isDone ? 'text-gray-400' : 'text-gray-200'}
+                  className={`text-xs mt-0.5 font-bold transition-colors duration-300
+                    ${isActive ? 'text-black/60' : isDone ? 'text-gray-400' : 'text-gray-200'}
                   `}
                 >
                   {step.description}

@@ -131,32 +131,28 @@ export default function HomePage() {
       )}
 
       {/* Hero */}
-      <section className="py-8 sm:py-12">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand via-emerald-600 to-teal-700 p-8 sm:p-12 text-white">
-          {/* Decorative circles */}
-          <div className="absolute -top-12 -right-12 w-48 h-48 bg-white/10 rounded-full blur-2xl" />
-          <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-white/5 rounded-full blur-xl" />
-
+      <section className="py-6 sm:py-8">
+        <div className="relative overflow-hidden rounded-[40px] bg-[#FFC107] p-8 sm:p-14 shadow-xl shadow-[#FFC107]/20">
           <div className="relative z-10">
-            <span className="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm text-sm font-medium px-3 py-1 rounded-full mb-4">
-              <Clock className="w-3.5 h-3.5" />
+            <span className="inline-flex items-center gap-1.5 bg-black text-white text-sm font-bold px-4 py-2 rounded-full mb-6 shadow-md hover:scale-105 transition-transform">
+              <Clock className="w-4 h-4" />
               Now delivering near you
             </span>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight max-w-lg">
-              Groceries delivered in <span className="text-accent">10 minutes</span>
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black text-black leading-[1.1] max-w-2xl tracking-tighter">
+              Groceries delivered in <br/><span className="text-white drop-shadow-md">10 minutes.</span>
             </h1>
-            <p className="text-white/70 mt-3 text-base sm:text-lg max-w-md">
+            <p className="text-black/80 mt-6 text-lg sm:text-xl max-w-md font-bold leading-relaxed">
               Fresh fruits, daily essentials, and snacks — at your doorstep before you know it.
             </p>
 
             {/* Feature pills */}
-            <div className="flex flex-wrap gap-3 mt-6">
+            <div className="flex flex-wrap gap-3 mt-10">
               {HERO_FEATURES.map(({ icon: Icon, label }) => (
                 <div
                   key={label}
-                  className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-xl text-sm font-medium"
+                  className="flex items-center gap-2 bg-white/40 backdrop-blur-md border border-white/50 px-5 py-3 rounded-2xl text-sm font-bold text-black shadow-sm hover:bg-white/60 transition-colors"
                 >
-                  <Icon className="w-4 h-4 text-accent" />
+                  <Icon className="w-5 h-5" />
                   {label}
                 </div>
               ))}
@@ -166,18 +162,18 @@ export default function HomePage() {
       </section>
 
       {/* Search + Category Filters */}
-      <section className="sticky top-16 z-40 bg-gray-50 pt-2 pb-4">
+      <section className="sticky top-16 z-40 bg-[#FAFAFA] pt-2 pb-4">
         <div className="flex flex-col sm:flex-row gap-3">
           {/* Search */}
           <div className="relative flex-1">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-gray-400" />
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               id="product-search"
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search for products..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-brand focus:ring-2 focus:ring-brand/10 transition-all duration-200"
+              className="w-full pl-13 pr-5 py-4 rounded-[20px] border-2 border-gray-100 bg-white text-base font-bold text-gray-900 placeholder-gray-400 outline-none focus:border-black transition-all duration-300 shadow-sm hover:border-gray-200"
             />
           </div>
 
@@ -187,10 +183,10 @@ export default function HomePage() {
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-200 ${
+                className={`px-6 py-3 rounded-[20px] text-sm font-bold whitespace-nowrap transition-all duration-300 ${
                   activeCategory === cat
-                    ? 'bg-brand text-white shadow-md shadow-brand/20'
-                    : 'bg-white text-gray-600 border border-gray-200 hover:border-brand/30 hover:text-brand'
+                    ? 'bg-black text-white shadow-xl shadow-black/20 scale-105'
+                    : 'bg-white text-gray-500 border-2 border-gray-100 hover:border-gray-200 hover:text-black shadow-sm'
                 }`}
               >
                 {cat}
@@ -205,7 +201,7 @@ export default function HomePage() {
         {loading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="bg-white rounded-2xl border border-gray-100 overflow-hidden animate-pulse">
+              <div key={i} className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] animate-pulse">
                 <div className="aspect-square bg-gray-100" />
                 <div className="p-3.5 space-y-2">
                   <div className="h-4 bg-gray-100 rounded-lg w-3/4" />

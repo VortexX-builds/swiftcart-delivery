@@ -63,7 +63,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                 {items.map(({ product, quantity }) => (
                   <div
                     key={product.id}
-                    className="flex items-center gap-4 bg-gray-50 rounded-2xl p-3 transition-all duration-200 hover:bg-gray-100"
+                    className="flex items-center gap-4 bg-white border-2 border-gray-100 rounded-[20px] p-3 transition-all duration-200 hover:border-black"
                   >
                     {/* Product Image */}
                     <div className="w-16 h-16 rounded-xl bg-white flex-shrink-0 overflow-hidden border border-gray-100">
@@ -79,26 +79,26 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
 
                     {/* Product Details */}
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-900 truncate">{product.name}</p>
-                      <p className="text-sm font-bold text-brand mt-0.5">₹{product.price}</p>
+                      <p className="text-sm font-bold text-gray-900 truncate">{product.name}</p>
+                      <p className="text-sm font-black text-black mt-0.5">₹{product.price}</p>
                     </div>
 
                     {/* Quantity Controls */}
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 bg-black rounded-full p-1 shadow-lg shadow-black/10">
                       <button
                         onClick={() =>
                           quantity === 1
                             ? removeItem(product.id)
                             : updateQuantity(product.id, quantity - 1)
                         }
-                        className="w-7 h-7 rounded-lg bg-white border border-gray-200 flex items-center justify-center hover:border-brand hover:text-brand transition-colors"
+                        className="w-7 h-7 rounded-full flex items-center justify-center text-white hover:bg-gray-800 transition-colors"
                       >
                         <Minus className="w-3.5 h-3.5" />
                       </button>
-                      <span className="w-7 text-center text-sm font-bold text-brand">{quantity}</span>
+                      <span className="w-6 text-center text-xs font-bold text-white">{quantity}</span>
                       <button
                         onClick={() => updateQuantity(product.id, quantity + 1)}
-                        className="w-7 h-7 rounded-lg bg-brand text-white flex items-center justify-center hover:bg-brand-dark transition-colors"
+                        className="w-7 h-7 rounded-full flex items-center justify-center text-white hover:bg-gray-800 transition-colors"
                       >
                         <Plus className="w-3.5 h-3.5" />
                       </button>
@@ -119,7 +119,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                 </div>
                 <button
                   onClick={handleCheckout}
-                  className="flex items-center gap-2 bg-brand text-white px-6 py-3 rounded-2xl text-sm font-bold hover:bg-brand-dark active:scale-[0.97] transition-all duration-200 shadow-lg shadow-brand/25"
+                  className="flex items-center gap-2 bg-black hover:bg-gray-800 text-white px-8 py-4 rounded-full text-sm font-bold active:scale-[0.98] transition-all duration-200 shadow-xl shadow-black/20"
                 >
                   Checkout
                   <ArrowRight className="w-4 h-4" />

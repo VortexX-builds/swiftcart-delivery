@@ -95,19 +95,19 @@ export default function CheckoutPage() {
         style={{ animation: 'scaleIn 250ms cubic-bezier(0.34,1.56,0.64,1)' }}
       >
         {/* Top gradient bar */}
-        <div className="h-1.5 w-full bg-gradient-to-r from-brand via-brand-dark to-brand" />
+        <div className="h-2 w-full bg-[#00E676]" />
 
         <div className="p-8 text-center">
           {/* Icon */}
-          <div className="relative mx-auto w-20 h-20 mb-5">
-            <div className="absolute inset-0 bg-brand/20 rounded-full animate-ping" />
-            <div className="relative w-20 h-20 bg-brand rounded-full flex items-center justify-center shadow-xl shadow-brand/30">
-              <CheckCircle className="w-10 h-10 text-white" />
+          <div className="relative mx-auto w-24 h-24 mb-6">
+            <div className="absolute inset-0 bg-[#00E676]/20 rounded-full animate-ping" />
+            <div className="relative w-24 h-24 bg-[#00E676] rounded-full flex items-center justify-center shadow-xl shadow-[#00E676]/30">
+              <CheckCircle className="w-12 h-12 text-black" />
             </div>
           </div>
 
-          <h2 className="text-2xl font-bold text-gray-900 mb-1">Order Placed! 🎉</h2>
-          <p className="text-sm text-gray-400 mb-1">Your order is confirmed and being prepared.</p>
+          <h2 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">Order Placed! 🎉</h2>
+          <p className="text-sm font-bold text-gray-500 mb-2">Your order is confirmed and being prepared.</p>
           {orderId && (
             <div className="inline-flex items-center gap-1.5 mt-2 mb-6 bg-gray-50 border border-gray-100 rounded-lg px-3 py-1.5">
               <span className="text-xs text-gray-400">Order ID</span>
@@ -118,12 +118,12 @@ export default function CheckoutPage() {
           {/* Divider */}
           <div className="border-t border-gray-100 mb-6" />
 
-          <div className="flex flex-col gap-2.5">
+          <div className="flex flex-col gap-3">
             {orderId && (
               <button
                 id="track-order-btn"
                 onClick={() => navigate(`/order-tracking/${orderId}`)}
-                className="w-full flex items-center justify-center gap-2 bg-brand text-white py-3.5 rounded-2xl text-sm font-bold hover:bg-brand-dark active:scale-[0.97] transition-all duration-200 shadow-lg shadow-brand/25"
+                className="w-full flex items-center justify-center gap-2 bg-black hover:bg-gray-800 text-white font-bold py-4 rounded-full text-sm active:scale-[0.98] transition-all duration-200 shadow-xl shadow-black/20"
               >
                 🛵 Track My Order
               </button>
@@ -131,7 +131,7 @@ export default function CheckoutPage() {
             <button
               id="continue-shopping-btn"
               onClick={() => navigate('/')}
-              className="w-full flex items-center justify-center gap-2 bg-gray-50 text-gray-700 border border-gray-200 py-3 rounded-2xl text-sm font-semibold hover:bg-gray-100 active:scale-[0.97] transition-all duration-200"
+              className="w-full flex items-center justify-center gap-2 bg-white text-black border-2 border-gray-200 py-3.5 rounded-full text-sm font-bold hover:border-black active:scale-[0.97] transition-all duration-200"
             >
               Continue Shopping
             </button>
@@ -194,7 +194,7 @@ export default function CheckoutPage() {
           {step === 'review' && (
             <>
               {/* Delivery Info Card */}
-              <div className="bg-white rounded-2xl border border-gray-100 p-5">
+              <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-brand/10 flex items-center justify-center">
                     <MapPin className="w-5 h-5 text-brand" />
@@ -207,7 +207,7 @@ export default function CheckoutPage() {
               </div>
 
               {/* Items */}
-              <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+              <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
                 <div className="px-5 py-4 border-b border-gray-50">
                   <h2 className="text-sm font-bold text-gray-900 flex items-center gap-2">
                     <ShoppingBag className="w-4 h-4 text-brand" />
@@ -275,7 +275,7 @@ export default function CheckoutPage() {
                   {orderError}
                 </div>
               )}
-              <div className="bg-white rounded-2xl border border-gray-100 p-5">
+              <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
                 <PaymentPanel
                   grandTotal={grandTotal}
                   onConfirm={handlePlaceOrder}
@@ -288,7 +288,7 @@ export default function CheckoutPage() {
 
         {/* Right Column — Order Summary (always visible) */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-2xl border border-gray-100 p-5 sticky top-24 space-y-4">
+          <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] sticky top-24 space-y-4">
             <h2 className="text-sm font-bold text-gray-900 flex items-center gap-2">
               <CreditCard className="w-4 h-4 text-brand" />
               Order Summary
@@ -335,7 +335,7 @@ export default function CheckoutPage() {
               <button
                 id="proceed-to-payment-btn"
                 onClick={() => setStep('payment')}
-                className="w-full flex items-center justify-center gap-2 bg-brand text-white py-3.5 rounded-2xl text-sm font-bold hover:bg-brand-dark active:scale-[0.97] transition-all duration-200 shadow-lg shadow-brand/25"
+                className="w-full flex items-center justify-center gap-2 bg-black hover:bg-gray-800 text-white font-bold py-4 rounded-full text-sm active:scale-[0.98] transition-all duration-200 shadow-xl shadow-black/20"
               >
                 Proceed to Payment
               </button>

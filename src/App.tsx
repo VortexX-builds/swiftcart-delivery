@@ -27,11 +27,11 @@ import { Zap } from 'lucide-react';
 
 function LoadingScreen() {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-4">
+    <div className="min-h-screen bg-[#F8F9FA] flex flex-col items-center justify-center gap-4">
       <div className="w-14 h-14 rounded-2xl bg-brand flex items-center justify-center shadow-lg shadow-brand/25 animate-pulse">
         <Zap className="w-7 h-7 text-white" strokeWidth={2.5} />
       </div>
-      <div className="w-6 h-6 border-2 border-gray-200 border-t-brand rounded-full animate-spin" />
+      <div className="w-6 h-6 border-2 border-slate-200 border-t-brand rounded-full animate-spin" />
     </div>
   );
 }
@@ -80,7 +80,7 @@ function AppLayout() {
 
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans">
+    <div className="min-h-screen bg-[#FAFAFA] text-slate-900 font-sans selection:bg-brand/20 selection:text-brand-dark">
       <Navbar onCartClick={() => setCartOpen(true)} />
       <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
       <Toaster position="top-center" richColors />
