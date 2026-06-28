@@ -50,9 +50,16 @@ export default function CheckoutPage() {
 
       if (error) throw error;
       newOrderId = data;
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Order error:', err);
-      if (err.message?.includes('Out of stock') || err.message?.includes('Insufficient stock')) {
+      let errorMessage = 'An unknown error occurred';
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      } else if (typeof err === 'object' && err !== null && 'message' in err) {
+        errorMessage = String((err as { message: unknown }).message);
+      }
+
+      if (errorMessage.includes('Out of stock') || errorMessage.includes('Insufficient stock')) {
         setOrderError('Checkout failed: One or more items in your cart exceed available stock. Please adjust quantities.');
       } else {
         setOrderError('Something went wrong placing your order. Please try again.');

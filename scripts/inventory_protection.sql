@@ -13,8 +13,8 @@ DECLARE
     current_stock INT;
 BEGIN
     -- Create the new order
-    INSERT INTO orders (user_id, total_amount, status)
-    VALUES (p_user_id, p_total_amount, 'pending')
+    INSERT INTO orders (user_id, total_amount, status, cart_items)
+    VALUES (p_user_id, p_total_amount, 'pending', p_cart_items)
     RETURNING id INTO new_order_id;
 
     -- Process each item in the cart
@@ -30,10 +30,6 @@ BEGIN
 
         -- Update the product stock
         UPDATE products SET stock = stock - item.quantity WHERE id = item.id;
-
-        -- Insert the order item
-        INSERT INTO order_items (order_id, product_id, quantity, price_at_time)
-        VALUES (new_order_id, item.id, item.quantity, item.price);
     END LOOP;
 
     RETURN new_order_id;

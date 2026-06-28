@@ -36,9 +36,15 @@ export default function AdminUsers() {
       })) as AdminProfile[];
       
       setUsers(mappedData);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error fetching users:', err);
-      setError(err.message || 'Failed to load users');
+      let errorMessage = 'An unknown error occurred';
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      } else if (typeof err === 'object' && err !== null && 'message' in err) {
+        errorMessage = String((err as { message: unknown }).message);
+      }
+      setError(errorMessage || 'Failed to load users');
     } finally {
       setIsLoading(false);
     }
@@ -66,8 +72,14 @@ export default function AdminUsers() {
         .eq('id', userId);
 
       if (error) throw error;
-    } catch (err: any) {
-      console.error('Failed to update role:', err);
+    } catch (err: unknown) {
+      let errorMessage = 'An unknown error occurred';
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      } else if (typeof err === 'object' && err !== null && 'message' in err) {
+        errorMessage = String((err as { message: unknown }).message);
+      }
+      console.error('Failed to update role:', errorMessage);
       setUsers((prev) =>
         prev.map((u) => (u.id === userId ? { ...u, role: previousRole } : u))
       );
@@ -94,8 +106,14 @@ export default function AdminUsers() {
         .eq('id', userId);
 
       if (error) throw error;
-    } catch (err: any) {
-      console.error('Failed to toggle ban status:', err);
+    } catch (err: unknown) {
+      let errorMessage = 'An unknown error occurred';
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      } else if (typeof err === 'object' && err !== null && 'message' in err) {
+        errorMessage = String((err as { message: unknown }).message);
+      }
+      console.error('Failed to toggle ban status:', errorMessage);
       // Revert Optimistic Update on Error
       setUsers((prev) =>
         prev.map((u) => (u.id === userId ? { ...u, is_banned: currentBanStatus } : u))
