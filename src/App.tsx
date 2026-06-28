@@ -20,6 +20,7 @@ import AdminLayout from './layouts/AdminLayout';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import AdminUsers from './pages/Admin/AdminUsers';
 import AdminSettings from './pages/Admin/AdminSettings';
+import AnalyticsDashboard from './pages/Admin/AnalyticsDashboard';
 import MaintenanceView from './pages/Maintenance/MaintenanceView';
 import { useMaintenance } from './hooks/useMaintenance';
 import { Zap } from 'lucide-react';
@@ -137,6 +138,7 @@ function AppLayout() {
               <Route path="orders" element={<AdminDashboard />} />
               <Route path="users" element={<AdminUsers />} />
               <Route path="settings" element={<AdminSettings />} />
+              <Route path="analytics" element={<AnalyticsDashboard />} />
             </Route>
           </Route>
         </Routes>

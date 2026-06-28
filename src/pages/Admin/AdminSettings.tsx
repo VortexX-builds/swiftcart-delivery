@@ -181,7 +181,7 @@ export default function AdminSettings() {
                   checked={settings.maintenance_mode}
                   onChange={(e) => setSettings({ ...settings, maintenance_mode: e.target.checked })}
                 />
-                <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-red-600"></div>
+                <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-200 rounded-full peer transition-colors duration-300 ease-in-out peer-checked:bg-red-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-6 after:w-6 after:shadow-[0_2px_4px_rgba(0,0,0,0.25)] after:transition-transform after:duration-300 after:ease-in-out peer-checked:after:translate-x-7"></div>
               </label>
             </div>
           </div>

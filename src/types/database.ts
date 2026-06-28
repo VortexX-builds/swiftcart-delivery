@@ -36,3 +36,12 @@ export interface CartItem {
   product: Product;
   quantity: number;
 }
+
+export interface InventoryProduct {
+  id: string;
+  name: string;
+  sku: string | null;
+  stock: number;
+  price: number;
+  category: string;
+}

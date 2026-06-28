@@ -1,5 +1,5 @@
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, Users, Settings, LogOut, BarChart3 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function AdminLayout() {
@@ -8,6 +8,7 @@ export default function AdminLayout() {
 
   const navItems = [
     { name: 'Orders', path: '/admin/orders', icon: LayoutDashboard },
+    { name: 'Analytics', path: '/admin/analytics', icon: BarChart3 },
     { name: 'Users', path: '/admin/users', icon: Users },
     { name: 'Settings', path: '/admin/settings', icon: Settings },
   ];

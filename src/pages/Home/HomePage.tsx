@@ -7,7 +7,7 @@ import { SIM_DELIVERED_MS } from '../../lib/simulationConfig';
 import type { Product, Order } from '../../types/database';
 import ProductCard from '../../components/shared/ProductCard';
 
-const CATEGORIES = ['All', 'Snacks', 'Dairy', 'Vegetables'] as const;
+// Categories are now dynamically derived from the database products
 
 const HERO_FEATURES = [
   { icon: Clock, label: 'Delivery in 10 min' },
@@ -21,6 +21,9 @@ export default function HomePage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<string>('All');
+
+  // Derive unique categories dynamically from the fetched product data
+  const categories = ['All', ...Array.from(new Set(products.map(p => p.category))).sort()];
   const [searchQuery, setSearchQuery] = useState('');
   const activeOrder = activeOrders.length > 0 ? activeOrders[0] : null;
   const [dismissedOrderId, setDismissedOrderId] = useState<string | null>(null);
@@ -74,7 +77,7 @@ export default function HomePage() {
     currentTick - new Date(activeOrder.created_at).getTime() < 25_000;
 
   // Group products by category for "All" view
-  const groupedProducts = CATEGORIES.slice(1).reduce(
+  const groupedProducts = categories.slice(1).reduce(
     (acc, cat) => {
       const matching = filteredProducts.filter((p) => p.category === cat);
       if (matching.length > 0) acc[cat] = matching;
@@ -180,7 +183,7 @@ export default function HomePage() {
 
           {/* Category Pills */}
           <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-            {CATEGORIES.map((cat) => (
+            {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
