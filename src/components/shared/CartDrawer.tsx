@@ -44,6 +44,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
             </div>
             <button
               onClick={onClose}
+              aria-label="Close cart"
               className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-gray-100 transition-colors"
             >
               <X className="w-5 h-5 text-gray-400" />
@@ -99,6 +100,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                               ? removeItem(product.id)
                               : updateQuantity(product.id, quantity - 1)
                           }
+                          aria-label={quantity === 1 ? `Remove ${product.name} from cart` : `Decrease quantity of ${product.name}`}
                           className="w-7 h-7 rounded-full flex items-center justify-center text-white hover:bg-gray-800 transition-colors"
                         >
                           <Minus className="w-3.5 h-3.5" />
@@ -128,6 +130,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                         <button
                           onClick={() => updateQuantity(product.id, quantity + 1)}
                           disabled={quantity >= product.stock}
+                          aria-label={`Increase quantity of ${product.name}`}
                           className={`w-7 h-7 rounded-full flex items-center justify-center text-white transition-colors ${
                             quantity >= product.stock ? 'opacity-50 cursor-not-allowed bg-gray-500 hover:bg-gray-500' : 'hover:bg-gray-800'
                           }`}

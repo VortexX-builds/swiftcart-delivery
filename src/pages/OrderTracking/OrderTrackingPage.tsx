@@ -172,6 +172,7 @@ export default function OrderTrackingPage() {
       <div className="flex items-center gap-3 mb-6">
         <button
           onClick={() => navigate('/')}
+          aria-label="Go back to home"
           className="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
         >
           <ArrowLeft className="w-5 h-5 text-gray-600" />
@@ -193,6 +194,7 @@ export default function OrderTrackingPage() {
               onClick={canCancel ? handleCancel : undefined}
               disabled={!canCancel || cancelling}
               title={!canCancel ? "Cannot cancel once the order is on the way." : undefined}
+              aria-label={cancelling ? "Cancelling order" : "Cancel Order"}
               className={`flex items-center gap-1.5 border-2 text-xs font-bold px-4 py-2 rounded-full transition-all ${
                 canCancel 
                   ? "bg-white text-red-500 border-red-500 hover:bg-red-50 active:scale-95 shadow-sm" 

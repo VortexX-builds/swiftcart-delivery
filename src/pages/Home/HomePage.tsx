@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Clock, Truck, Shield, ChevronRight, Navigation, X, XCircle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
@@ -23,7 +23,10 @@ export default function HomePage() {
   const [activeCategory, setActiveCategory] = useState<string>('All');
 
   // Derive unique categories dynamically from the fetched product data
-  const categories = ['All', ...Array.from(new Set(products.map(p => p.category))).sort()];
+  const categories = useMemo(
+    () => ['All', ...Array.from(new Set(products.map(p => p.category))).sort()],
+    [products]
+  );
   const [searchQuery, setSearchQuery] = useState('');
   const activeOrder = activeOrders.length > 0 ? activeOrders[0] : null;
   const [dismissedOrderId, setDismissedOrderId] = useState<string | null>(null);
@@ -44,30 +47,33 @@ export default function HomePage() {
     fetchProducts();
   }, []);
 
-
-
-  const filteredProducts = products.filter((p) => {
+  // ── Memoised filter + group ─────────────────────────────────────────────────
+  // products & categories only change on initial load. searchQuery and
+  // activeCategory change on user interaction. currentTick (every ~1s from
+  // OrderSimulationContext) must NOT trigger a full product re-filter, which
+  // is why these derivations are gated behind their real dependencies.
+  const filteredProducts = useMemo(() => products.filter((p) => {
     const matchesCategory = activeCategory === 'All' || p.category === activeCategory;
     const matchesSearch =
       searchQuery === '' ||
       p.name.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
-  });
+  }), [products, activeCategory, searchQuery]);
 
-  const handleBannerCancel = async () => {
+  const handleBannerCancel = useCallback(async () => {
     if (!activeOrder) return;
     setCancellingBanner(true);
     await cancelOrder(activeOrder.id);
     setCancellingBanner(false);
-  };
+  }, [activeOrder, cancelOrder]);
 
-  const getDynamicStatus = (order: Order | null) => {
+  const getDynamicStatus = useCallback((order: Order | null) => {
     if (!order) return null;
     if (order.status === 'cancelled' || order.status === 'delivered') return order.status;
     const elapsed = currentTick - new Date(order.created_at).getTime();
     if (elapsed >= SIM_DELIVERED_MS) return 'delivered';
     return order.status; // pending or processing
-  };
+  }, [currentTick]);
 
   const dynamicStatus = getDynamicStatus(activeOrder);
   const showBanner = activeOrder && dynamicStatus !== 'delivered' && dynamicStatus !== 'cancelled' && activeOrder.id !== dismissedOrderId;
@@ -76,15 +82,16 @@ export default function HomePage() {
   const bannerCanCancel = activeOrder?.status === 'pending' &&
     currentTick - new Date(activeOrder.created_at).getTime() < 25_000;
 
-  // Group products by category for "All" view
-  const groupedProducts = categories.slice(1).reduce(
+  // Group products by category for "All" view — only recomputes when
+  // filteredProducts or categories change (not on every simulation tick)
+  const groupedProducts = useMemo(() => categories.slice(1).reduce(
     (acc, cat) => {
       const matching = filteredProducts.filter((p) => p.category === cat);
       if (matching.length > 0) acc[cat] = matching;
       return acc;
     },
     {} as Record<string, Product[]>
-  );
+  ), [categories, filteredProducts]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">

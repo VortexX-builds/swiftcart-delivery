@@ -178,6 +178,7 @@ export default function AdminSettings() {
                 <input 
                   type="checkbox" 
                   className="sr-only peer"
+                  aria-label="Toggle maintenance mode"
                   checked={settings.maintenance_mode}
                   onChange={(e) => setSettings({ ...settings, maintenance_mode: e.target.checked })}
                 />

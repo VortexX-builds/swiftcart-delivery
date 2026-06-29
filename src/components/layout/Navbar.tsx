@@ -59,6 +59,7 @@ export default function Navbar({ onCartClick }: { onCartClick: () => void }) {
             <button
               id="cart-button"
               onClick={onCartClick}
+              aria-label={totalItems > 0 ? `Open cart, ${totalItems} item${totalItems > 1 ? 's' : ''}` : 'Open cart'}
               className="relative flex items-center gap-2 bg-black text-white px-6 py-3 rounded-full text-sm font-bold hover:bg-gray-800 active:scale-[0.97] transition-all duration-300 shadow-lg shadow-black/25 hover:shadow-xl hover:shadow-black/30"
             >
               <ShoppingCart className="w-4 h-4" />
@@ -81,12 +82,15 @@ export default function Navbar({ onCartClick }: { onCartClick: () => void }) {
                 <button
                   id="user-menu-button"
                   onClick={() => setDropdownOpen(!dropdownOpen)}
+                  aria-label="Open user menu"
+                  aria-expanded={dropdownOpen}
+                  aria-haspopup="true"
                   className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-colors duration-200 ${isAdmin ? 'text-zinc-300 hover:bg-zinc-900' : 'text-gray-700 hover:bg-gray-100'}`}
                 >
                   {profile?.avatar_url ? (
                     <img 
                       src={profile.avatar_url} 
-                      alt="Avatar" 
+                      alt={`${profile.full_name || user?.email || 'User'}'s avatar`}
                       className="w-7 h-7 rounded-full object-cover shadow-sm border border-gray-100" 
                     />
                   ) : (

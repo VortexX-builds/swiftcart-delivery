@@ -299,7 +299,7 @@ export default function PaymentPanel({ grandTotal, onConfirm, isProcessing }: Pa
 
           {/* Card Number */}
           <div>
-            <label className="text-xs font-semibold text-gray-500 mb-1.5 block">Card Number</label>
+            <label htmlFor="card-number-input" className="text-xs font-semibold text-gray-500 mb-1.5 block">Card Number</label>
             <input
               id="card-number-input"
               type="text"
@@ -317,7 +317,7 @@ export default function PaymentPanel({ grandTotal, onConfirm, isProcessing }: Pa
           <div className="grid grid-cols-2 gap-3">
             {/* Expiry */}
             <div>
-              <label className="text-xs font-semibold text-gray-500 mb-1.5 block">Expiry</label>
+              <label htmlFor="card-expiry-input" className="text-xs font-semibold text-gray-500 mb-1.5 block">Expiry</label>
               <input
                 id="card-expiry-input"
                 type="text"
@@ -334,7 +334,7 @@ export default function PaymentPanel({ grandTotal, onConfirm, isProcessing }: Pa
 
             {/* CVV */}
             <div>
-              <label className="text-xs font-semibold text-gray-500 mb-1.5 block">CVV</label>
+              <label htmlFor="card-cvv-input" className="text-xs font-semibold text-gray-500 mb-1.5 block">CVV</label>
               <input
                 id="card-cvv-input"
                 type="password"

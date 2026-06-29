@@ -1,29 +1,37 @@
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { OrderSimulationProvider } from './context/OrderSimulationContext';
 import { Toaster } from 'sonner';
+import { Zap } from 'lucide-react';
 import Navbar from './components/layout/Navbar';
 import CartDrawer from './components/shared/CartDrawer';
-import HomePage from './pages/Home/HomePage';
-import LoginPage from './pages/Auth/LoginPage';
-import SignupPage from './pages/Auth/SignupPage';
-import CheckoutPage from './pages/Checkout/CheckoutPage';
-import ProfilePage from './pages/Profile/ProfilePage';
-import ProfileSetupPage from './pages/Profile/ProfileSetupPage';
-import SettingsPage from './pages/Profile/SettingsPage';
-import OrderTrackingPage from './pages/OrderTracking/OrderTrackingPage';
-import MockUpiPage from './pages/MockUpiPage';
 import AdminProtectedRoute from './components/AdminProtectedRoute';
-import AdminLayout from './layouts/AdminLayout';
-import AdminDashboard from './pages/Admin/AdminDashboard';
-import AdminUsers from './pages/Admin/AdminUsers';
-import AdminSettings from './pages/Admin/AdminSettings';
-import AnalyticsDashboard from './pages/Admin/AnalyticsDashboard';
-import MaintenanceView from './pages/Maintenance/MaintenanceView';
 import { useMaintenance } from './hooks/useMaintenance';
-import { Zap } from 'lucide-react';
+
+// ── Lazy-loaded consumer routes ───────────────────────────────────────────────
+// Each gets its own async chunk. None of these will ever pull in Recharts or
+// admin-only code — that is guaranteed by the separate admin chunk group below.
+const HomePage          = lazy(() => import('./pages/Home/HomePage'));
+const LoginPage         = lazy(() => import('./pages/Auth/LoginPage'));
+const SignupPage        = lazy(() => import('./pages/Auth/SignupPage'));
+const CheckoutPage      = lazy(() => import('./pages/Checkout/CheckoutPage'));
+const ProfilePage       = lazy(() => import('./pages/Profile/ProfilePage'));
+const ProfileSetupPage  = lazy(() => import('./pages/Profile/ProfileSetupPage'));
+const SettingsPage      = lazy(() => import('./pages/Profile/SettingsPage'));
+const OrderTrackingPage = lazy(() => import('./pages/OrderTracking/OrderTrackingPage'));
+const MockUpiPage       = lazy(() => import('./pages/MockUpiPage'));
+const MaintenanceView   = lazy(() => import('./pages/Maintenance/MaintenanceView'));
+
+// ── Lazy-loaded admin routes (isolated chunk group) ───────────────────────────
+// Recharts (vendor-charts chunk) is ONLY referenced here. A consumer visiting
+// /checkout will never download it.
+const AdminLayout        = lazy(() => import('./layouts/AdminLayout'));
+const AdminDashboard     = lazy(() => import('./pages/Admin/AdminDashboard'));
+const AdminUsers         = lazy(() => import('./pages/Admin/AdminUsers'));
+const AdminSettings      = lazy(() => import('./pages/Admin/AdminSettings'));
+const AnalyticsDashboard = lazy(() => import('./pages/Admin/AnalyticsDashboard'));
 
 function LoadingScreen() {
   return (
@@ -62,7 +70,11 @@ function AppLayout() {
   // log in and disable maintenance mode without being locked out.
   const isAdminRoute = location.pathname.startsWith('/admin');
   if (isMaintenanceMode && !isAdminRoute) {
-    return <MaintenanceView />;
+    return (
+      <Suspense fallback={<LoadingScreen />}>
+        <MaintenanceView />
+      </Suspense>
+    );
   }
 
   // Profile completion check
@@ -77,8 +89,6 @@ function AppLayout() {
     return <Navigate to="/" replace />;
   }
 
-
-
   return (
     <div className="min-h-screen bg-[#FAFAFA] text-slate-900 font-sans selection:bg-brand/20 selection:text-brand-dark">
       <Navbar onCartClick={() => setCartOpen(true)} />
@@ -86,62 +96,66 @@ function AppLayout() {
       <Toaster position="top-center" richColors />
 
       <main>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route
-            path="/checkout"
-            element={
-              <ProtectedRoute>
-                <CheckoutPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <ProfilePage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile-setup"
-            element={
-              <ProtectedRoute>
-                <ProfileSetupPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/settings"
-            element={
-              <ProtectedRoute>
-                <SettingsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/order-tracking/:orderId"
-            element={
-              <ProtectedRoute>
-                <OrderTrackingPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/mock-payment" element={<MockUpiPage />} />
-          
-          <Route path="/admin" element={<AdminProtectedRoute />}>
-            <Route element={<AdminLayout />}>
-              <Route index element={<Navigate to="orders" replace />} />
-              <Route path="orders" element={<AdminDashboard />} />
-              <Route path="users" element={<AdminUsers />} />
-              <Route path="settings" element={<AdminSettings />} />
-              <Route path="analytics" element={<AnalyticsDashboard />} />
+        {/* Single Suspense boundary for the entire route tree.
+            LoadingScreen is shown while any lazy chunk is being fetched. */}
+        <Suspense fallback={<LoadingScreen />}>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+            <Route
+              path="/checkout"
+              element={
+                <ProtectedRoute>
+                  <CheckoutPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <ProfilePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile-setup"
+              element={
+                <ProtectedRoute>
+                  <ProfileSetupPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <ProtectedRoute>
+                  <SettingsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/order-tracking/:orderId"
+              element={
+                <ProtectedRoute>
+                  <OrderTrackingPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/mock-payment" element={<MockUpiPage />} />
+            
+            <Route path="/admin" element={<AdminProtectedRoute />}>
+              <Route element={<AdminLayout />}>
+                <Route index element={<Navigate to="orders" replace />} />
+                <Route path="orders" element={<AdminDashboard />} />
+                <Route path="users" element={<AdminUsers />} />
+                <Route path="settings" element={<AdminSettings />} />
+                <Route path="analytics" element={<AnalyticsDashboard />} />
+              </Route>
             </Route>
-          </Route>
-        </Routes>
+          </Routes>
+        </Suspense>
       </main>
     </div>
   );

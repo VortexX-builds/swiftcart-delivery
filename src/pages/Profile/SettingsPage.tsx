@@ -43,6 +43,7 @@ export default function SettingsPage() {
       <div className="flex items-center gap-3 mb-8">
         <button
           onClick={() => navigate('/profile')}
+          aria-label="Go back to profile"
           className="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
         >
           <ArrowLeft className="w-5 h-5 text-gray-600" />

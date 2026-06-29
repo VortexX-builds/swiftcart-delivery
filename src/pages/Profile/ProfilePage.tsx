@@ -87,6 +87,7 @@ export default function ProfilePage() {
       <div className="flex items-center gap-3 mb-8">
         <button
           onClick={() => navigate('/')}
+          aria-label="Go back to home"
           className="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
         >
           <ArrowLeft className="w-5 h-5 text-gray-600" />
@@ -115,6 +116,7 @@ export default function ProfilePage() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => navigate('/settings')}
+              aria-label="Open settings"
               className="p-2 rounded-xl text-gray-400 hover:bg-gray-50 hover:text-gray-900 transition-colors"
               title="Settings"
             >
@@ -122,6 +124,7 @@ export default function ProfilePage() {
             </button>
             <button
               onClick={handleSignOut}
+              aria-label="Sign out"
               className="p-2 rounded-xl text-red-400 hover:bg-red-50 hover:text-red-500 transition-colors"
               title="Sign Out"
             >

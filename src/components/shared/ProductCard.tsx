@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import { Plus, Minus } from 'lucide-react';
 import type { Product } from '../../types/database';
 import { useCart } from '../../context/CartContext';
@@ -7,7 +7,12 @@ interface ProductCardProps {
   product: Product;
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+// ── React.memo ────────────────────────────────────────────────────────────────
+// ProductCard is rendered inside a large grid. When the user updates one item's
+// quantity the entire CartContext value updates, causing every card in the grid
+// to re-render unless we memoize. With memo + stable useCallback handlers below,
+// only the card whose `product` prop or `quantity` actually changed will paint.
+const ProductCard = memo(function ProductCard({ product }: ProductCardProps) {
   const [imgError, setImgError] = useState(false);
   const { items, addItem, updateQuantity, removeItem } = useCart();
   const cartItem = items.find((i) => i.product.id === product.id);
@@ -19,6 +24,18 @@ export default function ProductCard({ product }: ProductCardProps) {
     setLocalQuantity(quantity.toString());
   }, [quantity]);
 
+  // ── Stable handlers (required for React.memo to actually skip re-renders) ──
+  const handleAdd = useCallback(() => addItem(product), [addItem, product]);
+
+  const handleDecrement = useCallback(() => {
+    if (quantity === 1) removeItem(product.id);
+    else updateQuantity(product.id, quantity - 1);
+  }, [quantity, removeItem, updateQuantity, product.id]);
+
+  const handleIncrement = useCallback(() => {
+    updateQuantity(product.id, quantity + 1);
+  }, [updateQuantity, product.id, quantity]);
+
   return (
     <div className="group bg-white rounded-[24px] border border-gray-100/60 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.06)] hover:-translate-y-1.5 transition-all duration-300 ease-out">
       {/* Image */}
@@ -27,6 +44,16 @@ export default function ProductCard({ product }: ProductCardProps) {
           src={(!product.image_url || imgError) ? '/placeholder.png' : product.image_url}
           alt={product.name}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+          // ── CLS prevention ──────────────────────────────────────────────
+          // Explicit width + height let the browser reserve the exact layout
+          // space before the image loads, eliminating Cumulative Layout Shift.
+          // The parent's `aspect-square` class also enforces a 1:1 ratio as a
+          // CSS-level fallback for any render before width/height are applied.
+          width={400}
+          height={400}
+          // ── Lazy loading ─────────────────────────────────────────────────
+          // Below-fold images are deferred until they approach the viewport,
+          // reducing initial page weight and improving LCP.
           loading="lazy"
           onError={() => setImgError(true)}
         />
@@ -64,7 +91,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             <>
               {quantity === 0 ? (
                 <button
-                  onClick={() => addItem(product)}
+                  onClick={handleAdd}
                   className="flex items-center gap-1.5 bg-black hover:bg-gray-800 text-white px-5 py-2.5 rounded-full text-sm font-bold shadow-lg shadow-black/20 active:scale-[0.95] transition-all duration-300"
                 >
                   <Plus className="w-4 h-4" />
@@ -73,11 +100,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               ) : (
                 <div className="flex items-center gap-1 bg-black rounded-full overflow-hidden shadow-lg shadow-black/20">
                   <button
-                    onClick={() =>
-                      quantity === 1
-                        ? removeItem(product.id)
-                        : updateQuantity(product.id, quantity - 1)
-                    }
+                    onClick={handleDecrement}
                     className="w-10 h-10 flex items-center justify-center text-white hover:bg-gray-800 transition-colors active:scale-90"
                   >
                     <Minus className="w-4 h-4" />
@@ -103,7 +126,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                     className="w-8 text-center text-base sm:text-sm font-bold text-white bg-transparent outline-none appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                   <button
-                    onClick={() => updateQuantity(product.id, quantity + 1)}
+                    onClick={handleIncrement}
                     disabled={quantity >= product.stock}
                     className={`w-10 h-10 flex items-center justify-center text-white transition-colors active:scale-90 ${
                       quantity >= product.stock ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-800'
@@ -125,4 +148,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       </div>
     </div>
   );
-}
+});
+
+export default ProductCard;
+

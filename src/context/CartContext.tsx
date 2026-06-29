@@ -4,6 +4,7 @@ import {
   useState,
   useCallback,
   useEffect,
+  useMemo,
   type ReactNode,
 } from 'react';
 import type { Product, CartItem } from '../types/database';
@@ -68,8 +69,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const clearCart = useCallback(() => setItems([]), []);
 
-  const totalItems = items.reduce((sum, i) => sum + i.quantity, 0);
-  const totalPrice = items.reduce((sum, i) => sum + i.product.price * i.quantity, 0);
+  // ── Memoised derived values ──────────────────────────────────────────────
+  // Only recomputed when `items` reference changes, preventing unnecessary
+  // re-renders in all consumers (Navbar badge, CartDrawer footer, etc.)
+  const totalItems = useMemo(
+    () => items.reduce((sum, i) => sum + i.quantity, 0),
+    [items]
+  );
+  const totalPrice = useMemo(
+    () => items.reduce((sum, i) => sum + i.product.price * i.quantity, 0),
+    [items]
+  );
+
 
   return (
     <CartContext.Provider

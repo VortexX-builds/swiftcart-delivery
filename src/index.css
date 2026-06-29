@@ -4,7 +4,7 @@
   /* ── Brand tokens ────────────────────────────────── */
   --color-brand-dark: #09090b;    /* zinc-950 — admin main bg */
   --color-brand-surface: #18181b; /* zinc-900 — admin cards   */
-  --color-brand-accent: #10B981;  /* emerald-500 — CTA green  */
+  --color-brand-accent: #059669;  /* emerald-600 — CTA green, improved contrast  */
   --color-brand: #0c831f;         /* consumer primary green   */
   --color-accent: #ffc200;        /* warm yellow accent       */
 
