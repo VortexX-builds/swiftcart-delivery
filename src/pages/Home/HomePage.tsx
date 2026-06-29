@@ -173,7 +173,7 @@ export default function HomePage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search for products..."
-              className="w-full pl-13 pr-5 py-4 rounded-[20px] border-2 border-gray-100 bg-white text-base font-bold text-gray-900 placeholder-gray-400 outline-none focus:border-black transition-all duration-300 shadow-sm hover:border-gray-200"
+              className="w-full pl-[52px] pr-5 py-4 rounded-[20px] border-2 border-gray-100 bg-white text-base font-bold text-gray-900 placeholder-gray-400 outline-none focus:border-black transition-all duration-300 shadow-sm hover:border-gray-200"
             />
           </div>
 

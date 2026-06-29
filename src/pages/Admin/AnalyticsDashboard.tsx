@@ -1,6 +1,6 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, type ReactNode } from 'react';
 import { supabase } from '../../lib/supabase';
-import type { Order, InventoryProduct } from '../../types/database';
+import type { Order } from '../../types/database';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend,
@@ -28,6 +28,16 @@ interface StatusSlice {
   name: string;
   value: number;
   color: string;
+}
+
+/** Flat product shape returned by the inventory query (id, name, sku, stock, price, category). */
+interface InventoryProduct {
+  id: string;
+  name: string;
+  sku: string | null;
+  stock: number;
+  price: number;
+  category: string;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -272,7 +282,7 @@ export default function AnalyticsDashboard() {
                 <XAxis dataKey="date" tick={{ fontSize: 12, fill: '#71717a' }} />
                 <YAxis tick={{ fontSize: 12, fill: '#71717a' }} tickFormatter={v => `₹${(v / 1000).toFixed(0)}k`} />
                 <Tooltip
-                  formatter={(value: number) => [formatCurrency(value), 'Revenue']}
+                  formatter={(value) => [formatCurrency(value as number), 'Revenue']}
                   contentStyle={{ borderRadius: '8px', border: '1px solid #3f3f46', background: '#27272a', color: '#e4e4e7' }}
                 />
                 <Line
@@ -311,7 +321,7 @@ export default function AnalyticsDashboard() {
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={(value: number, name: string) => [`${value} orders`, name]}
+                  formatter={(value, name) => [`${value} orders`, name]}
                   contentStyle={{ borderRadius: '8px', border: '1px solid #3f3f46', background: '#27272a', color: '#e4e4e7' }}
                 />
                 <Legend
@@ -494,7 +504,7 @@ export default function AnalyticsDashboard() {
 interface KPICardProps {
   title: string;
   value: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
   color: 'emerald' | 'blue' | 'violet' | 'red';
   loading?: boolean;
 }

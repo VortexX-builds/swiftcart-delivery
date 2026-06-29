@@ -15,7 +15,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const outOfStock = product.stock <= 0;
 
   return (
-    <div className="group bg-white rounded-[24px] border border-gray-100/60 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.06)] hover:-translate-y-1.5 transition-all duration-400 ease-out">
+    <div className="group bg-white rounded-[24px] border border-gray-100/60 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.06)] hover:-translate-y-1.5 transition-all duration-300 ease-out">
       {/* Image */}
       <div className="relative aspect-square bg-gray-50/50 overflow-hidden">
         <img

@@ -74,8 +74,8 @@ export default function ProfileSetupPage() {
 
       await refreshProfile();
       navigate('/');
-    } catch (err: any) {
-      setError(err.message || 'An error occurred while saving your profile.');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'An error occurred while saving your profile.');
     } finally {
       setLoading(false);
     }

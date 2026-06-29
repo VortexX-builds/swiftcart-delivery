@@ -290,7 +290,7 @@ export default function OrderTrackingPage() {
               Items Ordered
             </h3>
             <div className="divide-y divide-gray-50">
-              {order?.cart_items?.map((item: any) => (
+              {order?.cart_items?.map((item) => (
                 <div key={item.id} className="py-3 flex justify-between">
                   <div>
                     <p className="text-sm font-semibold text-gray-900">{item.name}</p>
@@ -308,7 +308,7 @@ export default function OrderTrackingPage() {
               Billing Details
             </h3>
             {(() => {
-              const subtotal = order?.cart_items?.reduce((acc: number, item: any) => acc + item.price * item.quantity, 0) || 0;
+              const subtotal = order?.cart_items?.reduce((acc: number, item) => acc + item.price * item.quantity, 0) || 0;
               const { platformFee, cgst, sgst, deliveryFee, grandTotal } = calculateBillingBreakdown(subtotal);
               return (
                 <div className="space-y-3 text-sm">
@@ -347,12 +347,6 @@ export default function OrderTrackingPage() {
         </div>
       )}
 
-      <style>{`
-        @keyframes scaleIn {
-          from { opacity: 0; transform: scale(0.85) }
-          to   { opacity: 1; transform: scale(1) }
-        }
-      `}</style>
     </div>
   );
 }

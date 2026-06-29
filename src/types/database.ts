@@ -22,12 +22,25 @@ export interface Profile {
   updated_at: string;
 }
 
+/**
+ * Flat snapshot of a cart item as stored in the `orders.cart_items` JSONB column.
+ * This is distinct from `CartItem` (which holds a full `Product` object) — the
+ * checkout process serialises only the fields needed for order history display.
+ */
+export interface OrderCartItem {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  image_url: string | null;
+}
+
 export interface Order {
   id: string;
   user_id: string;
   total_amount: number;
   status: 'pending' | 'processing' | 'delivered' | 'cancelled';
-  cart_items: CartItem[];
+  cart_items: OrderCartItem[];
   payment_method?: 'upi' | 'card' | 'cod' | null;
   created_at: string;
 }
@@ -37,11 +50,3 @@ export interface CartItem {
   quantity: number;
 }
 
-export interface InventoryProduct {
-  id: string;
-  name: string;
-  sku: string | null;
-  stock: number;
-  price: number;
-  category: string;
-}

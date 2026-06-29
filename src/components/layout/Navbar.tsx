@@ -101,7 +101,7 @@ export default function Navbar({ onCartClick }: { onCartClick: () => void }) {
                   <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl shadow-black/10 border border-gray-100 py-2 animate-[fade-in-down_0.15s_ease-out]">
                     <div className="px-4 py-2.5 border-b border-gray-100">
                       <p className="text-xs text-gray-400 font-medium">Signed in as</p>
-                      <p className="text-sm text-gray-900 font-semibold truncate">{user.email}</p>
+                      <p className="text-sm text-gray-900 font-semibold truncate">{user?.email}</p>
                     </div>
                     <Link
                       to="/profile"

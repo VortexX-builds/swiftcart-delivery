@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { Package, Clock, ArrowLeft, LogOut, Wallet, Settings, MapPin, Phone, Navigation, XCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -6,6 +6,7 @@ import { useOrderSimulation } from '../../context/OrderSimulationContext';
 import { supabase } from '../../lib/supabase';
 import type { Order } from '../../types/database';
 import { SIM_ON_THE_WAY_MS, SIM_DELIVERED_MS } from '../../lib/simulationConfig';
+import { toast } from 'sonner';
 
 export default function ProfilePage() {
   const { user, profile, signOut } = useAuth();
@@ -16,11 +17,7 @@ export default function ProfilePage() {
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'active' | 'past'>('active');
 
-  useEffect(() => {
-    fetchOrders();
-  }, [user, activeOrders]);
-
-  async function fetchOrders() {
+  const fetchOrders = useCallback(async () => {
     if (!user) return;
     const { data, error } = await supabase
       .from('orders')
@@ -29,7 +26,11 @@ export default function ProfilePage() {
       .order('created_at', { ascending: false });
     if (!error && data) setOrders(data as Order[]);
     setLoading(false);
-  }
+  }, [user]);
+
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders, activeOrders]);
 
   const handleCancel = async (orderId: string) => {
     setCancellingId(orderId);
@@ -161,7 +162,7 @@ export default function ProfilePage() {
             <p className="text-3xl font-bold">₹{profile?.wallet_balance || 0}</p>
           </div>
           <button 
-            onClick={() => alert('Add Funds modal would open here (MVP mock)')}
+            onClick={() => toast.info('Top-up coming soon! 🚀')}
             className="bg-white text-brand px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-emerald-50 transition-colors active:scale-95"
           >
             + Add Funds

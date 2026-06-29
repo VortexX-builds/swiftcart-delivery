@@ -259,7 +259,6 @@ export default function AdminDashboard() {
               >
                 <option value="pending">Pending</option>
                 <option value="processing">Processing (On the Way)</option>
-                <option value="shipped">Shipped</option>
                 <option value="delivered">Delivered</option>
                 <option value="cancelled">Cancelled</option>
               </select>
