@@ -92,54 +92,56 @@ export default function HomePage() {
       {/* Active Order Banner — shown for pending/processing orders, dismissable per-order */}
       {showBanner && activeOrder && (
         <div
-          className="mt-4 mb-2 flex items-center gap-4 bg-gradient-to-r from-brand to-emerald-500 text-white px-5 py-4 rounded-2xl shadow-lg shadow-brand/25"
+          className="mt-4 mb-2 flex flex-wrap items-center gap-4 bg-gradient-to-r from-brand to-emerald-500 text-white px-5 py-4 rounded-2xl shadow-lg shadow-brand/25"
           style={{ animation: 'slideDown 300ms ease' }}
         >
           <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0 text-lg">
             🛵
           </div>
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-[200px] flex-grow">
             <p className="text-sm font-bold">Your order is on the way!</p>
-            <p className="text-xs text-white/75 font-mono">
+            <p className="text-xs text-white/75 font-mono truncate">
               Order #{activeOrder.id.slice(0, 8).toUpperCase()} · ₹{activeOrder.total_amount}
             </p>
           </div>
-          <button
-            onClick={() => navigate(`/order-tracking/${activeOrder.id}`)}
-            className="flex items-center gap-1.5 bg-white text-brand text-xs font-bold px-3.5 py-2 rounded-xl hover:bg-white/90 active:scale-95 transition-all flex-shrink-0"
-          >
-            <Navigation className="w-3.5 h-3.5" />
-            Track
-          </button>
-          {bannerCanCancel && (
+          <div className="flex items-center gap-2 ml-auto">
             <button
-              onClick={handleBannerCancel}
-              disabled={cancellingBanner}
-              className="flex items-center gap-1 bg-white/20 hover:bg-white/30 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all flex-shrink-0 disabled:opacity-50"
+              onClick={() => navigate(`/order-tracking/${activeOrder.id}`)}
+              className="flex items-center gap-1.5 bg-white text-brand text-xs font-bold px-3.5 py-2 rounded-xl hover:bg-white/90 active:scale-95 transition-all flex-shrink-0 whitespace-nowrap"
             >
-              <XCircle className="w-3.5 h-3.5" />
-              {cancellingBanner ? '…' : 'Cancel'}
+              <Navigation className="w-3.5 h-3.5" />
+              Track
             </button>
-          )}
-          <button
-            onClick={() => setDismissedOrderId(activeOrder.id)}
-            className="w-8 h-8 bg-white/10 hover:bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
+            {bannerCanCancel && (
+              <button
+                onClick={handleBannerCancel}
+                disabled={cancellingBanner}
+                className="flex items-center gap-1 bg-white/20 hover:bg-white/30 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all flex-shrink-0 disabled:opacity-50 whitespace-nowrap"
+              >
+                <XCircle className="w-3.5 h-3.5" />
+                {cancellingBanner ? '…' : 'Cancel'}
+              </button>
+            )}
+            <button
+              onClick={() => setDismissedOrderId(activeOrder.id)}
+              className="w-8 h-8 bg-white/10 hover:bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       )}
 
       {/* Hero */}
       <section className="py-6 sm:py-8">
-        <div className="relative overflow-hidden rounded-[40px] bg-[#FFC107] p-8 sm:p-14 shadow-xl shadow-[#FFC107]/20">
+        <div className="relative overflow-hidden rounded-[40px] bg-[#FFC107] p-6 sm:p-8 md:p-14 shadow-xl shadow-[#FFC107]/20">
           <div className="relative z-10">
             <span className="inline-flex items-center gap-1.5 bg-black text-white text-sm font-bold px-4 py-2 rounded-full mb-6 shadow-md hover:scale-105 transition-transform">
               <Clock className="w-4 h-4" />
               Now delivering near you
             </span>
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black text-black leading-[1.1] max-w-2xl tracking-tighter">
-              Groceries delivered in <br/><span className="text-white drop-shadow-md">10 minutes.</span>
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black text-black leading-[1.1] max-w-2xl tracking-tighter text-balance">
+              Groceries delivered in <br className="hidden sm:block" /><span className="text-white drop-shadow-md">10 minutes.</span>
             </h1>
             <p className="text-black/80 mt-6 text-lg sm:text-xl max-w-md font-bold leading-relaxed">
               Fresh fruits, daily essentials, and snacks — at your doorstep before you know it.

@@ -20,6 +20,7 @@ export default function CheckoutPage() {
   const navigate = useNavigate();
   const { scheduleNewOrder } = useOrderSimulation();
   const [step, setStep] = useState<CheckoutStep>('review');
+  const [localQuantities, setLocalQuantities] = useState<Record<string, string>>({});
   const [orderId, setOrderId] = useState<string | null>(null);
   const [orderError, setOrderError] = useState<string | null>(null);
 
@@ -220,25 +221,27 @@ export default function CheckoutPage() {
                 </div>
                 <div className="divide-y divide-gray-50">
                   {items.map(({ product, quantity }) => (
-                    <div key={product.id} className="flex items-center gap-4 px-5 py-4">
-                      <div className="w-14 h-14 rounded-xl bg-gray-50 flex-shrink-0 overflow-hidden border border-gray-100">
-                        <img
-                          src={product.image_url || '/placeholder.png'}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = '/placeholder.png';
-                          }}
-                        />
+                    <div key={product.id} className="flex flex-col sm:flex-row sm:items-center gap-4 px-5 py-4">
+                      <div className="flex items-center gap-4 w-full sm:w-auto sm:flex-1 min-w-0">
+                        <div className="w-14 h-14 rounded-xl bg-gray-50 flex-shrink-0 overflow-hidden border border-gray-100">
+                          <img
+                            src={product.image_url || '/placeholder.png'}
+                            alt={product.name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = '/placeholder.png';
+                            }}
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-gray-900 truncate">{product.name}</p>
+                          <p className="text-sm text-brand font-bold">₹{product.price}</p>
+                          {quantity >= product.stock && (
+                            <p className="text-[10px] font-bold text-red-500 mt-0.5">Max stock reached</p>
+                          )}
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-gray-900 truncate">{product.name}</p>
-                        <p className="text-sm text-brand font-bold">₹{product.price}</p>
-                        {quantity >= product.stock && (
-                          <p className="text-[10px] font-bold text-red-500 mt-0.5">Max stock reached</p>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-2">
                         <div className="flex items-center gap-1 bg-gray-50 rounded-lg">
                           <button
                             onClick={() =>
@@ -256,13 +259,25 @@ export default function CheckoutPage() {
                           </button>
                           <input
                             type="number"
-                            value={quantity}
+                            value={localQuantities[product.id] ?? quantity.toString()}
                             onChange={(e) => {
-                              const val = parseInt(e.target.value, 10);
-                              if (isNaN(val) || val < 1) return;
-                              updateQuantity(product.id, val > product.stock ? product.stock : val);
+                              const raw = e.target.value;
+                              setLocalQuantities(prev => ({ ...prev, [product.id]: raw }));
+                              const val = parseInt(raw, 10);
+                              if (!isNaN(val) && val >= 1) {
+                                updateQuantity(product.id, val > product.stock ? product.stock : val);
+                              }
                             }}
-                            className="w-8 text-center text-sm font-bold text-gray-900 bg-transparent outline-none appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            onBlur={() => {
+                              const raw = localQuantities[product.id];
+                              if (raw === undefined) return;
+                              let val = parseInt(raw, 10);
+                              if (isNaN(val) || val < 1) val = 1;
+                              if (val > product.stock) val = product.stock;
+                              updateQuantity(product.id, val);
+                              setLocalQuantities(prev => ({ ...prev, [product.id]: val.toString() }));
+                            }}
+                            className="w-10 text-center text-base sm:text-sm font-bold text-gray-900 bg-transparent outline-none appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           />
                           <button
                             onClick={() => updateQuantity(product.id, quantity + 1)}
@@ -274,7 +289,7 @@ export default function CheckoutPage() {
                             <Plus className="w-3.5 h-3.5 text-gray-500" />
                           </button>
                         </div>
-                        <p className="text-sm font-bold text-gray-900 w-16 text-right">
+                        <p className="text-sm font-bold text-gray-900 min-w-[4rem] text-right truncate">
                           ₹{(product.price * quantity).toFixed(2)}
                         </p>
                       </div>
@@ -314,28 +329,28 @@ export default function CheckoutPage() {
             </h2>
 
             <div className="space-y-3 text-sm">
-              <div className="flex justify-between text-gray-500">
+              <div className="flex flex-wrap gap-x-4 gap-y-1 justify-between text-gray-500">
                 <span>Subtotal</span>
-                <span className="font-semibold text-gray-900">₹{subtotal.toFixed(2)}</span>
+                <span className="font-semibold text-gray-900 truncate">₹{subtotal.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-gray-500">
+              <div className="flex flex-wrap gap-x-4 gap-y-1 justify-between text-gray-500">
                 <span>Platform Fee</span>
-                <span className="font-semibold text-gray-900">₹{platformFee.toFixed(2)}</span>
+                <span className="font-semibold text-gray-900 truncate">₹{platformFee.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-gray-500">
+              <div className="flex flex-wrap gap-x-4 gap-y-1 justify-between text-gray-500">
                 <span>CGST (2.5%)</span>
-                <span className="font-semibold text-gray-900">₹{cgst.toFixed(2)}</span>
+                <span className="font-semibold text-gray-900 truncate">₹{cgst.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-gray-500">
+              <div className="flex flex-wrap gap-x-4 gap-y-1 justify-between text-gray-500">
                 <span>SGST (2.5%)</span>
-                <span className="font-semibold text-gray-900">₹{sgst.toFixed(2)}</span>
+                <span className="font-semibold text-gray-900 truncate">₹{sgst.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-gray-500">
+              <div className="flex flex-wrap gap-x-4 gap-y-1 justify-between text-gray-500">
                 <span>Delivery Fee</span>
                 {deliveryFee === 0 ? (
-                  <span className="font-semibold text-brand">FREE</span>
+                  <span className="font-semibold text-brand truncate">FREE</span>
                 ) : (
-                  <span className="font-semibold text-gray-900">₹{deliveryFee.toFixed(2)}</span>
+                  <span className="font-semibold text-gray-900 truncate">₹{deliveryFee.toFixed(2)}</span>
                 )}
               </div>
               {deliveryFee > 0 && (

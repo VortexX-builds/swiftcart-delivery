@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Minus } from 'lucide-react';
 import type { Product } from '../../types/database';
 import { useCart } from '../../context/CartContext';
@@ -13,6 +13,11 @@ export default function ProductCard({ product }: ProductCardProps) {
   const cartItem = items.find((i) => i.product.id === product.id);
   const quantity = cartItem?.quantity ?? 0;
   const outOfStock = product.stock <= 0;
+
+  const [localQuantity, setLocalQuantity] = useState(quantity.toString());
+  useEffect(() => {
+    setLocalQuantity(quantity.toString());
+  }, [quantity]);
 
   return (
     <div className="group bg-white rounded-[24px] border border-gray-100/60 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.06)] hover:-translate-y-1.5 transition-all duration-300 ease-out">
@@ -79,13 +84,23 @@ export default function ProductCard({ product }: ProductCardProps) {
                   </button>
                   <input
                     type="number"
-                    value={quantity}
+                    value={localQuantity}
                     onChange={(e) => {
-                      const val = parseInt(e.target.value, 10);
-                      if (isNaN(val) || val < 1) return;
-                      updateQuantity(product.id, val > product.stock ? product.stock : val);
+                      const raw = e.target.value;
+                      setLocalQuantity(raw);
+                      const val = parseInt(raw, 10);
+                      if (!isNaN(val) && val >= 1) {
+                        updateQuantity(product.id, val > product.stock ? product.stock : val);
+                      }
                     }}
-                    className="w-6 text-center text-sm font-bold text-white bg-transparent outline-none appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    onBlur={() => {
+                      let val = parseInt(localQuantity, 10);
+                      if (isNaN(val) || val < 1) val = 1;
+                      if (val > product.stock) val = product.stock;
+                      updateQuantity(product.id, val);
+                      setLocalQuantity(val.toString());
+                    }}
+                    className="w-8 text-center text-base sm:text-sm font-bold text-white bg-transparent outline-none appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                   <button
                     onClick={() => updateQuantity(product.id, quantity + 1)}

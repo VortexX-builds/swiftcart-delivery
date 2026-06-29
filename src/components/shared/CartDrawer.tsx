@@ -1,6 +1,7 @@
 import { X, Minus, Plus, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -10,6 +11,7 @@ interface CartDrawerProps {
 export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   const { items, totalItems, totalPrice, updateQuantity, removeItem } = useCart();
   const navigate = useNavigate();
+  const [localQuantities, setLocalQuantities] = useState<Record<string, string>>({});
 
   const handleCheckout = () => {
     onClose();
@@ -63,60 +65,76 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                 {items.map(({ product, quantity }) => (
                   <div
                     key={product.id}
-                    className="flex items-center gap-4 bg-white border-2 border-gray-100 rounded-[20px] p-3 transition-all duration-200 hover:border-black"
+                    className="flex flex-col sm:flex-row sm:items-center gap-4 bg-white border-2 border-gray-100 rounded-[20px] p-3 transition-all duration-200 hover:border-black"
                   >
-                    {/* Product Image */}
-                    <div className="w-16 h-16 rounded-xl bg-white flex-shrink-0 overflow-hidden border border-gray-100">
-                      <img
-                        src={product.image_url || '/placeholder.png'}
-                        alt={product.name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = '/placeholder.png';
-                        }}
-                      />
-                    </div>
+                    <div className="flex items-center gap-4 w-full sm:w-auto sm:flex-1 min-w-0">
+                      {/* Product Image */}
+                      <div className="w-16 h-16 rounded-xl bg-white flex-shrink-0 overflow-hidden border border-gray-100">
+                        <img
+                          src={product.image_url || '/placeholder.png'}
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/placeholder.png';
+                          }}
+                        />
+                      </div>
 
-                    {/* Product Details */}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-gray-900 truncate">{product.name}</p>
-                      <p className="text-sm font-black text-black mt-0.5">₹{product.price}</p>
-                      {quantity >= product.stock && (
-                        <p className="text-[10px] font-bold text-red-500 mt-0.5">Max stock reached</p>
-                      )}
+                      {/* Product Details */}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-gray-900 truncate">{product.name}</p>
+                        <p className="text-sm font-black text-black mt-0.5">₹{product.price}</p>
+                        {quantity >= product.stock && (
+                          <p className="text-[10px] font-bold text-red-500 mt-0.5">Max stock reached</p>
+                        )}
+                      </div>
                     </div>
 
                     {/* Quantity Controls */}
-                    <div className="flex items-center gap-1 bg-black rounded-full p-1 shadow-lg shadow-black/10">
-                      <button
-                        onClick={() =>
-                          quantity === 1
-                            ? removeItem(product.id)
-                            : updateQuantity(product.id, quantity - 1)
-                        }
-                        className="w-7 h-7 rounded-full flex items-center justify-center text-white hover:bg-gray-800 transition-colors"
-                      >
-                        <Minus className="w-3.5 h-3.5" />
-                      </button>
-                      <input
-                        type="number"
-                        value={quantity}
-                        onChange={(e) => {
-                          const val = parseInt(e.target.value, 10);
-                          if (isNaN(val) || val < 1) return;
-                          updateQuantity(product.id, val > product.stock ? product.stock : val);
-                        }}
-                        className="w-8 text-center text-xs font-bold text-white bg-transparent outline-none appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      />
-                      <button
-                        onClick={() => updateQuantity(product.id, quantity + 1)}
-                        disabled={quantity >= product.stock}
-                        className={`w-7 h-7 rounded-full flex items-center justify-center text-white transition-colors ${
-                          quantity >= product.stock ? 'opacity-50 cursor-not-allowed bg-gray-500 hover:bg-gray-500' : 'hover:bg-gray-800'
-                        }`}
-                      >
-                        <Plus className="w-3.5 h-3.5" />
-                      </button>
+                    <div className="flex justify-end w-full sm:w-auto">
+                      <div className="flex items-center gap-1 bg-black rounded-full p-1 shadow-lg shadow-black/10">
+                        <button
+                          onClick={() =>
+                            quantity === 1
+                              ? removeItem(product.id)
+                              : updateQuantity(product.id, quantity - 1)
+                          }
+                          className="w-7 h-7 rounded-full flex items-center justify-center text-white hover:bg-gray-800 transition-colors"
+                        >
+                          <Minus className="w-3.5 h-3.5" />
+                        </button>
+                        <input
+                          type="number"
+                          value={localQuantities[product.id] ?? quantity.toString()}
+                          onChange={(e) => {
+                            const raw = e.target.value;
+                            setLocalQuantities(prev => ({ ...prev, [product.id]: raw }));
+                            const val = parseInt(raw, 10);
+                            if (!isNaN(val) && val >= 1) {
+                              updateQuantity(product.id, val > product.stock ? product.stock : val);
+                            }
+                          }}
+                          onBlur={() => {
+                            const raw = localQuantities[product.id];
+                            if (raw === undefined) return;
+                            let val = parseInt(raw, 10);
+                            if (isNaN(val) || val < 1) val = 1;
+                            if (val > product.stock) val = product.stock;
+                            updateQuantity(product.id, val);
+                            setLocalQuantities(prev => ({ ...prev, [product.id]: val.toString() }));
+                          }}
+                          className="w-10 text-center text-base sm:text-xs font-bold text-white bg-transparent outline-none appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        />
+                        <button
+                          onClick={() => updateQuantity(product.id, quantity + 1)}
+                          disabled={quantity >= product.stock}
+                          className={`w-7 h-7 rounded-full flex items-center justify-center text-white transition-colors ${
+                            quantity >= product.stock ? 'opacity-50 cursor-not-allowed bg-gray-500 hover:bg-gray-500' : 'hover:bg-gray-800'
+                          }`}
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
